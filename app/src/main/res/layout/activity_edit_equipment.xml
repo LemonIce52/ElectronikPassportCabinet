@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="94dp"
+        android:background="@drawable/header_rounded"
+        android:elevation="3dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/closeButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginStart="15dp"
+            android:background="@drawable/ic_clear_48px"
+            android:contentDescription="@string/close_activity"
+            android:clickable="true"
+            android:focusable="true"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:text="@string/edit_data_equipment_name"
+            android:textColor="@color/black"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="35dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/header">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/header">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="78dp"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/header">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="17dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/name_equipment_input"
+                        android:textColor="@color/black"
+                        android:textSize="20sp" />
+
+                    <EditText
+                        android:id="@+id/name_equipment_input"
+                        android:layout_width="339dp"
+                        android:layout_height="48dp"
+                        android:autofillHints="none"
+                        android:background="@drawable/rounded_square_border"
+                        android:elevation="3dp"
+                        android:hint="@string/name_input_placeholder"
+                        android:inputType="text"
+                        android:outlineProvider="background"
+                        android:paddingLeft="16sp"
+                        android:paddingRight="16sp"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/group_equipment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="24dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/group_name"
+                        android:textColor="@color/black"
+                        android:textSize="20sp" />
+
+
+                    <FrameLayout
+                        android:layout_width="339dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/rounded_square_border">
+
+                        <Spinner
+                            android:id="@+id/group_equipment_spinner"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@android:color/transparent" />
+
+                        <ImageView
+                            android:id="@+id/group_arrow"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="end|center_vertical"
+                            android:layout_marginEnd="12dp"
+                            android:contentDescription="@string/arrow"
+                            android:src="@drawable/ic_keyboard_arrow_down_48px" />
+                    </FrameLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="24dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/state_equipment"
+                        android:textColor="@color/black"
+                        android:textSize="20sp" />
+
+
+                    <FrameLayout
+                        android:layout_width="339dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/rounded_square_border">
+
+                        <Spinner
+                            android:id="@+id/state_equipment"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@android:color/transparent" />
+
+                        <ImageView
+                            android:id="@+id/state_arrow"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="end|center_vertical"
+                            android:layout_marginEnd="12dp"
+                            android:contentDescription="@string/arrow"
+                            android:src="@drawable/ic_keyboard_arrow_down_48px" />
+                    </FrameLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="339dp"
+                    android:layout_height="78dp"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/header">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="17dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/identification_equipment"
+                        android:textColor="@color/black"
+                        android:textSize="20sp" />
+
+                    <EditText
+                        android:id="@+id/identification_input"
+                        android:layout_width="339dp"
+                        android:layout_height="48dp"
+                        android:autofillHints="none"
+                        android:background="@drawable/rounded_square_border"
+                        android:elevation="3dp"
+                        android:hint="@string/enter_identification_equipment"
+                        android:inputType="text"
+                        android:outlineProvider="background"
+                        android:paddingLeft="16sp"
+                        android:paddingRight="16sp"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <FrameLayout
+                    android:id="@+id/getQrButton"
+                    android:layout_width="264dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="19dp"
+                    android:background="@drawable/rounded_button"
+                    android:clickable="true"
+                    android:elevation="3dp"
+                    android:focusable="true">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/get_qr_code"
+                        android:textColor="@color/black"
+                        android:textSize="20sp" />
+
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="85dp"
+                    android:padding="18dp"
+                    android:background="@drawable/rounded_square_border"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ic_error_outline_48px"
+                        android:contentDescription="@string/alert"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/alert_eqioment_edit"
+                        android:fontFamily="sans-serif-medium"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:justificationMode="inter_word"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/deleteEquipmentButton"
+                android:layout_width="300dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/shape_btn_delete_user"
+                android:clickable="true"
+                android:elevation="3dp"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/delete_equipment_btn"
+                    android:textColor="@color/black"
+                    android:textSize="20sp" />
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/savedChangesButton"
+                android:layout_width="339dp"
+                android:layout_height="57dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="40dp"
+                android:background="@drawable/rounded_button"
+                android:clickable="true"
+                android:elevation="3dp"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/saved_changes"
+                    android:textColor="@color/black"
+                    android:textSize="24sp" />
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+
+    </ScrollView>
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

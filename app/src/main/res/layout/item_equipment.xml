@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardForeground"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="17dp"
+    android:background="@drawable/rounded_square_border"
+    android:elevation="4dp"
+    android:foreground="?attr/selectableItemBackground"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/nameEquipment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:textSize="20sp"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/black"
+        android:gravity="center"
+       tools:text="Компьютер"/>
+
+    <TextView
+        android:id="@+id/typeEquipment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="6dp"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/black"
+        android:gravity="start"
+        tools:text="Тип: Электронное уcтройство"/>
+
+    <TextView
+        android:id="@+id/groupEquipment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="6dp"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/black"
+        android:gravity="start"
+        tools:text="Ростовая группа: не указанно"/>
+
+    <TextView
+        android:id="@+id/numberEquipment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="6dp"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/black"
+        android:gravity="start"
+        tools:text="Номер: pi-173oi"/>
+
+    <TextView
+        android:id="@+id/stateEquipment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="6dp"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/black"
+        android:gravity="start"
+        tools:text="Состояние: Работает"/>
+
+    <TextView
+        android:id="@+id/cabinetEquipment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="6dp"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/black"
+        android:gravity="start"
+        tools:text="Закреплен за кабинетом: Не закреплен"/>
+
+    <TextView
+        android:id="@+id/dateEquipment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="14dp"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/black"
+        android:gravity="start"
+        tools:text="Дата последней проверки: 21.03.2006"/>
+
+</LinearLayout>

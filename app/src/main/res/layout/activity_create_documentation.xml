@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="94dp"
+        android:background="@drawable/header_rounded"
+        android:elevation="3dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/closeButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:layout_marginStart="15dp"
+            android:background="@drawable/ic_clear_48px"
+            android:contentDescription="@string/close_activity"
+            android:clickable="true"
+            android:focusable="true"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:layout_gravity="center"
+            android:text="@string/name_create_documents"
+            android:textColor="@color/black"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="17dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/header">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/document_type"
+                    android:textColor="@color/black"
+                    android:textSize="20sp" />
+
+
+                <FrameLayout
+                    android:layout_width="339dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/rounded_square_border">
+
+                    <Spinner
+                        android:id="@+id/typeDocument"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/transparent" />
+
+                    <ImageView
+                        android:id="@+id/year_arrow"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="end|center_vertical"
+                        android:layout_marginEnd="12dp"
+                        android:contentDescription="@string/arrow"
+                        android:src="@drawable/ic_keyboard_arrow_down_48px" />
+                </FrameLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/planPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                tools:visibility="visible">
+
+                <LinearLayout
+                    android:layout_width="339dp"
+                    android:layout_height="78dp"
+                    android:layout_marginTop="5dp"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/header">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="17dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/name_plan_price"
+                        android:textColor="@color/black"
+                        android:textSize="20sp" />
+
+                    <EditText
+                        android:id="@+id/planPriceInput"
+                        android:layout_width="339dp"
+                        android:layout_height="48dp"
+                        android:autofillHints="none"
+                        android:background="@drawable/rounded_square_border"
+                        android:elevation="3dp"
+                        android:hint="@string/plan_price"
+                        android:inputType="text"
+                        android:outlineProvider="background"
+                        android:paddingLeft="16sp"
+                        android:paddingRight="16sp"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="339dp"
+                    android:layout_height="78dp"
+                    android:layout_marginTop="5dp"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/header"
+                    tools:visibility="visible">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="17dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/name_period"
+                        android:textColor="@color/black"
+                        android:textSize="20sp" />
+
+                    <EditText
+                        android:id="@+id/periodInput"
+                        android:layout_width="339dp"
+                        android:layout_height="48dp"
+                        android:autofillHints="none"
+                        android:background="@drawable/rounded_square_border"
+                        android:clickable="true"
+                        android:drawableEnd="@drawable/ic_calendar"
+                        android:elevation="3dp"
+                        android:focusable="false"
+                        android:hint="@string/enter_period"
+                        android:inputType="text"
+                        android:outlineProvider="background"
+                        android:paddingLeft="16sp"
+                        android:paddingRight="16sp"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/buying"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/rounded_square_border"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="5dp"
+                tools:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/alert_document"
+                    android:textColor="@color/black"
+                    android:textSize="11sp"
+                    app:drawableLeftCompat="@drawable/ic_error_outline_15dp" />
+
+                <LinearLayout
+                    android:id="@+id/frameLayout2"
+                    android:layout_width="339dp"
+                    android:layout_height="78dp"
+                    android:layout_marginTop="4dp"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/header">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="24dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/name_oborud"
+                        android:textColor="@color/black"
+                        android:textSize="20sp" />
+
+                    <EditText
+                        android:id="@+id/name_equipment_input"
+                        android:layout_width="339dp"
+                        android:layout_height="48dp"
+                        android:autofillHints="none"
+                        android:background="@drawable/rounded_square_border"
+                        android:elevation="3dp"
+                        android:hint="@string/enter_name_oborud"
+                        android:inputType="text"
+                        android:outlineProvider="background"
+                        android:paddingLeft="16sp"
+                        android:paddingRight="16sp"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:id="@+id/frameLayout3"
+                        android:layout_width="163dp"
+                        android:layout_height="78dp"
+
+                        android:orientation="vertical"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/header">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="24dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="@string/name_price"
+                            android:textColor="@color/black"
+                            android:textSize="20sp" />
+
+                        <EditText
+                            android:id="@+id/priceInput"
+                            android:layout_width="163dp"
+                            android:layout_height="48dp"
+                            android:autofillHints="none"
+                            android:background="@drawable/rounded_square_border"
+                            android:elevation="3dp"
+                            android:hint="@string/enter_price"
+                            android:inputType="text"
+                            android:outlineProvider="background"
+                            android:paddingLeft="16sp"
+                            android:paddingRight="16sp"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                    <Space
+                        android:layout_width="13dp"
+                        android:layout_height="wrap_content" />
+
+                    <LinearLayout
+                        android:id="@+id/frameLayout4"
+                        android:layout_width="163dp"
+                        android:layout_height="78dp"
+                        android:orientation="vertical"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/header">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="24dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="@string/name_count"
+                            android:textColor="@color/black"
+                            android:textSize="20sp" />
+
+                        <EditText
+                            android:id="@+id/countInput"
+                            android:layout_width="163dp"
+                            android:layout_height="48dp"
+                            android:autofillHints="none"
+                            android:background="@drawable/rounded_square_border"
+                            android:elevation="3dp"
+                            android:hint="@string/enter_count"
+                            android:inputType="text"
+                            android:outlineProvider="background"
+                            android:paddingLeft="16sp"
+                            android:paddingRight="16sp"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+                </LinearLayout>
+
+                <FrameLayout
+                    android:id="@+id/addOborud"
+                    android:layout_width="339dp"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="13dp"
+                    android:background="@drawable/rounded_button"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/enter_equipment"
+                        android:textColor="@color/black"
+                        android:textSize="20sp" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/required_buy"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="20sp" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/oborudViewer"
+                    android:layout_width="339dp"
+                    android:layout_height="313dp"
+                    android:layout_marginTop="11dp"
+                    android:layout_marginBottom="22dp" />
+
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/create_document"
+                android:layout_width="339dp"
+                android:layout_height="57dp"
+                android:layout_marginTop="13dp"
+                android:background="@drawable/rounded_button"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/btn_create_document"
+                    android:textColor="@color/black"
+                    android:textSize="24sp" />
+            </FrameLayout>
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

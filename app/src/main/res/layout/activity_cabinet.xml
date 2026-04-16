@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="94dp"
+        android:background="@drawable/header_rounded"
+        android:elevation="3dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/returnButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:layout_marginStart="15dp"
+            android:background="@drawable/ic_keyboard_return"
+            android:clickable="true"
+            android:contentDescription="@string/return_btn"
+            android:focusable="true" />
+
+        <TextView
+            android:id="@+id/nameActivityCabinet"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            tools:text="Кабинет 303" />
+
+        <ImageView
+            android:id="@+id/editButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="26dp"
+            android:layout_gravity="center"
+            android:background="@drawable/ic_edit_48px"
+            android:clickable="true"
+            android:contentDescription="@string/icon_edit"
+            android:focusable="true" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="35dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="38dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/header">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_square_border"
+            android:orientation="vertical"
+            android:padding="13dp">
+
+            <ImageView
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:background="@drawable/ic_error_outline_15dp"
+                android:contentDescription="@string/alert" />
+
+            <TextView
+                android:id="@+id/type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                tools:text="Тип: Лаборатория" />
+
+            <TextView
+                android:id="@+id/width"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                tools:text="Ширина: 20м" />
+
+            <TextView
+                android:id="@+id/height"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                tools:text="Высота: 3м" />
+
+            <TextView
+                android:id="@+id/length"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                tools:text="Длина: 10м" />
+
+            <TextView
+                android:id="@+id/area"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                tools:text="Площадь: 200м^2" />
+
+            <FrameLayout
+                android:id="@+id/getQrButton"
+                android:layout_width="264dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="4dp"
+                android:background="@drawable/rounded_button"
+                android:clickable="true"
+                android:elevation="3dp"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/get_qr_code"
+                    android:textColor="@color/black"
+                    android:textSize="20sp" />
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/frameLayout"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="17dp"
+            android:background="@drawable/rounded_square_border"
+            android:elevation="3dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/header">
+
+            <ImageView
+                android:id="@+id/search_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="3dp"
+                android:layout_marginEnd="13dp"
+                android:layout_marginBottom="4dp"
+                android:background="@drawable/ic_search_48px"
+                android:contentDescription="@string/search_icon" />
+
+            <EditText
+                android:id="@+id/search_input_identification"
+                android:layout_width="257dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginStart="15dp"
+                android:autofillHints="name"
+                android:background="@android:color/transparent"
+                android:fontFamily="sans-serif-medium"
+                android:hint="@string/enter_identification"
+                android:inputType="text"
+                android:textColor="#747474"
+                android:textSize="16sp" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/equipmentViewer"
+        android:layout_width="339dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="17dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="14dp"
+        android:layout_marginBottom="61dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <FrameLayout
+            android:id="@+id/unpinEquipmentButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/rounded_button"
+            android:clickable="true"
+            android:elevation="3dp"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="center"
+                android:background="@drawable/ic_delete_48px"
+                android:contentDescription="@string/unpin_equipment" />
+
+        </FrameLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="9dp" />
+
+        <FrameLayout
+            android:id="@+id/addEquipmentButton"
+            android:layout_width="63dp"
+            android:layout_height="63dp"
+            android:background="@drawable/rounded_button"
+            android:clickable="true"
+            android:elevation="3dp"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:background="@drawable/ic_add_48px"
+                android:contentDescription="@string/add_documentation" />
+
+        </FrameLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="9dp" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

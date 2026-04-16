@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.Pass" parent="Theme.MaterialComponents.DayNight.NoActionBar" />
+
+    <!-- Основной стиль календаря -->
+    <style name="MyDatePickerStyle" parent="ThemeOverlay.MaterialComponents.MaterialCalendar">
+        <!-- Цвет фона самого диалога -->
+        <item name="colorSurface">@color/white</item>
+        <!-- Основной цвет (шапка, выделенная дата, кнопка ОК) -->
+        <item name="colorPrimary">#AEFF3C</item> <!-- Ваш цвет, например, оранжевый -->
+        <!-- Цвет текста на основном фоне -->
+        <item name="colorOnSurface">@color/black</item>
+        <!-- Цвет текста на основном цвете (например, число на оранжевом кружке) -->
+        <item name="colorOnPrimary">@color/black</item>
+    </style>
+</resources>
