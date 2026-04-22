@@ -3,7 +3,6 @@ package com.example.pass.database.users
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
@@ -13,8 +12,11 @@ interface UsersDao {
     @Insert
     suspend fun savedUser(user: UsersEntity)
 
-    @Query("SELECT * FROM User WHERE email = :email AND password = :password")
-    suspend fun getUser(email: String, password: String): UsersEntity?
+    @Query("SELECT * FROM User WHERE email = :email")
+    suspend fun getUser(email: String): UsersEntity?
+
+    @Query("SELECT COUNT(*) FROM User LIMIT 1")
+    suspend fun getFirstUser(): Int
 
     @Query("""
     SELECT * FROM User 
@@ -25,9 +27,6 @@ interface UsersDao {
 
     @Query("SELECT COUNT(*) FROM User WHERE email = :email")
     suspend fun getUsersOnEmail(email: String): Int
-
-    @Query("SELECT COUNT(*) FROM User WHERE password = :password")
-    suspend fun getUsersOnPassword(password: String): Int
 
     @Query("SELECT COUNT(*) FROM User WHERE email = :email AND userId <> :userId")
     suspend fun getUsersOnEmailEdit(email: String, userId: Long): Int

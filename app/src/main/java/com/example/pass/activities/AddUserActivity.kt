@@ -20,6 +20,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import org.mindrot.jbcrypt.BCrypt
 
 class AddUserActivity : AppCompatActivity() {
 
@@ -40,7 +41,26 @@ class AddUserActivity : AppCompatActivity() {
         var birthday: Date? = null
 
         dateInput.setOnClickListener {
-            birthday = inputDate(dateInput, birthday)
+            val builder = MaterialDatePicker.Builder.datePicker()
+                .setTheme(R.style.MyDatePickerStyle)
+                .setTitleText("Выберете дату рождения")
+                .setSelection(selectedDateInMs)
+
+            val datePicker = builder.build()
+
+            datePicker.show(supportFragmentManager, "DATE_PICKER")
+
+            datePicker.addOnPositiveButtonClickListener { selection ->
+                selectedDateInMs = selection
+                val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+                formatter.timeZone = TimeZone.getTimeZone("UTC")
+
+                val dateString = formatter.format(Date(selection))
+
+                dateInput.setText(dateString)
+
+                birthday = Date(selection)
+            }
         }
 
         closeButton.setOnClickListener {
@@ -67,31 +87,6 @@ class AddUserActivity : AppCompatActivity() {
             }
         }
 
-    }
-
-    private fun inputDate(dateInput: EditText, birthday: Date?): Date? {
-        var currBirthday = birthday
-        val builder = MaterialDatePicker.Builder.datePicker()
-            .setTheme(R.style.MyDatePickerStyle)
-            .setTitleText("Выберете дату рождения")
-            .setSelection(selectedDateInMs)
-
-        val datePicker = builder.build()
-
-        datePicker.show(supportFragmentManager, "DATE_PICKER")
-
-        datePicker.addOnPositiveButtonClickListener { selection ->
-            selectedDateInMs = selection
-            val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-            formatter.timeZone = TimeZone.getTimeZone("UTC")
-
-            val dateString = formatter.format(Date(selection))
-
-            dateInput.setText(dateString)
-
-            currBirthday = Date(selection)
-        }
-        return currBirthday
     }
 
     private fun registerUser(
@@ -125,7 +120,7 @@ class AddUserActivity : AppCompatActivity() {
                 lastName = lastName,
                 birthday = birthday!!,
                 email = email,
-                password = password,
+                password = hashPass(password),
                 role = Role.TECH_SPECIALIST
             )
 
@@ -133,6 +128,10 @@ class AddUserActivity : AppCompatActivity() {
 
             finish()
         }
+    }
+
+    private fun hashPass(password: String): String {
+        return BCrypt.hashpw(password, BCrypt.gensalt())
     }
 
     private suspend fun validationUserInputs(
@@ -180,10 +179,12 @@ class AddUserActivity : AppCompatActivity() {
             return true
         }
 
-        if (database.usersDao().getUsersOnPassword(passwordInput.text.toString()) > 0) {
-            passwordInput.error = "Пароль занят придумайте другой!"
+        if (passwordInput.text.length < 8) {
+            passwordInput.error = "Пароль должен состоять из 8 и более символов!"
             return true
         }
+
+
         return false
     }
 

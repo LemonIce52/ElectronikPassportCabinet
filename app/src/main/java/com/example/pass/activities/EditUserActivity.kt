@@ -16,6 +16,7 @@ import com.example.pass.dialog.DeleteUserDialog
 import com.example.pass.otherClasses.Animates
 import com.google.android.material.datepicker.MaterialDatePicker
 import kotlinx.coroutines.launch
+import org.mindrot.jbcrypt.BCrypt
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -61,12 +62,27 @@ class EditUserActivity : AppCompatActivity() {
             name,
             lastName,
             email,
-            password,
             dateInput
         )
 
         dateInput.setOnClickListener {
-            setDate(dateInput)
+            val builder = MaterialDatePicker.Builder.datePicker()
+                .setTheme(R.style.MyDatePickerStyle)
+                .setTitleText("Выберете дату рождения")
+                .setSelection(selectedDateInMs)
+
+            val datePicker = builder.build()
+
+            datePicker.show(supportFragmentManager, "DATE_PICKER")
+
+            datePicker.addOnPositiveButtonClickListener { selection ->
+                selectedDateInMs = selection
+
+                val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+                val dateString = formatter.format(Date(selection))
+
+                dateInput.setText(dateString)
+            }
         }
 
         closeButton.setOnClickListener {
@@ -103,26 +119,6 @@ class EditUserActivity : AppCompatActivity() {
         }
     }
 
-    private fun setDate(dateInput: EditText) {
-        val builder = MaterialDatePicker.Builder.datePicker()
-            .setTheme(R.style.MyDatePickerStyle)
-            .setTitleText("Выберете дату рождения")
-            .setSelection(selectedDateInMs)
-
-        val datePicker = builder.build()
-
-        datePicker.show(supportFragmentManager, "DATE_PICKER")
-
-        datePicker.addOnPositiveButtonClickListener { selection ->
-            selectedDateInMs = selection
-
-            val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-            val dateString = formatter.format(Date(selection))
-
-            dateInput.setText(dateString)
-        }
-    }
-
     private fun savedChangesButton(
         userEntity: UsersEntity?,
         db: AppDatabase,
@@ -138,23 +134,22 @@ class EditUserActivity : AppCompatActivity() {
             val formater = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
             val date: Date? = formater.parse(dateInput.text.toString())
 
-            if (validationUserInputs(userId, email, db, name, lastName, date, password)) {
+            if (validationUserInputs(userId, email, db, name, lastName, date)) {
                 return@launch
             }
 
+            if (userEntity != null) {
 
-            val currUserEntity: UsersEntity? = getCreatedUserEntity(
-                userId,
-                dateInput,
-                name,
-                lastName,
-                email,
-                password
-            )
+                val currUserEntity: UsersEntity? = getCreatedUserEntity(
+                    userId,
+                    dateInput,
+                    name,
+                    lastName,
+                    email,
+                    if (password.text.isEmpty()) userEntity.password else hashPass(password.text.toString())
+                )
 
-            if (userEntity != null && currUserEntity != null) {
-
-                if (currUserEntity != userEntity) {
+                if (currUserEntity != null && currUserEntity != userEntity) {
 
                     db.usersDao().updateUserData(currUserEntity)
 
@@ -166,7 +161,7 @@ class EditUserActivity : AppCompatActivity() {
                     finish()
                 } else {
                     Toast.makeText(
-                        this@EditUserActivity, "Данные пользователя не были изменены!",
+                        this@EditUserActivity, "Данные пользователя не были изменены или возникла проблема!",
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -197,19 +192,19 @@ class EditUserActivity : AppCompatActivity() {
         password: EditText,
         dateInput: EditText
     ) {
-        val currUserEntity: UsersEntity? = getCreatedUserEntity(
-            userId = userId,
-            birthday = dateInput,
-            name = name,
-            lastName = lastName,
-            email = email,
-            password = password
-        )
-
         lifecycleScope.launch {
             val userEntity: UsersEntity? = db.usersDao().getUserOnId(userId)
+            if (userEntity != null) {
 
-            if (userEntity != null && currUserEntity != null) {
+                val currUserEntity: UsersEntity? = getCreatedUserEntity(
+                    userId = userId,
+                    birthday = dateInput,
+                    name = name,
+                    lastName = lastName,
+                    email = email,
+                    password = if (password.text.isEmpty()) userEntity.password else hashPass(password.text.toString())
+                )
+
                 if (userEntity == currUserEntity) {
                     val dialog = CloseDialog()
                     dialog.show(supportFragmentManager, "CloseDialog")
@@ -229,7 +224,6 @@ class EditUserActivity : AppCompatActivity() {
         nameInput: EditText,
         lastNameInput: EditText,
         birthday: Date?,
-        passwordInput: EditText
     ): Boolean {
         val errorMessage: String = emailValidation(emailInput.text.toString())
 
@@ -263,21 +257,12 @@ class EditUserActivity : AppCompatActivity() {
             return true
         }
 
-        if (passwordInput.text.isEmpty()) {
-            passwordInput.error = "Пароль не может быть пустым!"
-            return true
-        }
-
-        if (database.usersDao().getUsersOnPasswordEdit(passwordInput.text.toString(), userId) > 0) {
-            passwordInput.error = "Пароль занят придумайте другой!"
-            return true
-        }
         return false
     }
 
     private fun emailValidation(email: String): String {
         if (email.isEmpty()) return "Почта не может быть пустой!"
-        if (!email.contains('@')) return "Почта должна сожержать @!"
+        if (!email.contains('@')) return "Почта должна содержать @!"
 
         return ""
     }
@@ -299,7 +284,6 @@ class EditUserActivity : AppCompatActivity() {
         name: EditText,
         lastName: EditText,
         email: EditText,
-        password: EditText,
         dateInput: EditText
     ) {
 
@@ -311,7 +295,6 @@ class EditUserActivity : AppCompatActivity() {
                 name.setText(userEntity.name)
                 lastName.setText(userEntity.lastName)
                 email.setText(userEntity.email)
-                password.setText(userEntity.password)
 
                 val birthday: Date = userEntity.birthday
                 val formater = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
@@ -331,7 +314,7 @@ class EditUserActivity : AppCompatActivity() {
         name: EditText,
         lastName: EditText,
         email: EditText,
-        password: EditText
+        password: String
     ): UsersEntity? {
         try {
             val formater = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
@@ -348,7 +331,7 @@ class EditUserActivity : AppCompatActivity() {
                     lastName = lastName.text.toString(),
                     birthday = calendar.time,
                     email = email.text.toString(),
-                    password = password.text.toString(),
+                    password = password,
                     role = Role.TECH_SPECIALIST
                 )
 
@@ -360,5 +343,9 @@ class EditUserActivity : AppCompatActivity() {
             Toast.makeText(this, "Произошла ошибка!", Toast.LENGTH_LONG).show()
             return null
         }
+    }
+
+    private fun hashPass(password: String): String {
+        return BCrypt.hashpw(password, BCrypt.gensalt())
     }
 }

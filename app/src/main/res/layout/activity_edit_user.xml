@@ -36,253 +36,246 @@
             android:textSize="20sp" />
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/linearLayout2"
-        android:layout_width="339dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="35dp"
-        android:orientation="vertical"
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/header">
 
         <LinearLayout
-            android:id="@+id/frameLayout2"
             android:layout_width="339dp"
-            android:layout_height="78dp"
-            android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/header">
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="35dp"
+            android:gravity="center"
+            android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="17dp"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/name"
-                android:textColor="@color/black"
-                android:textSize="20sp" />
-
-            <EditText
-                android:id="@+id/name_equipment_input"
+            <LinearLayout
                 android:layout_width="339dp"
-                android:layout_height="48dp"
-                android:autofillHints="emailAddress"
-                android:background="@drawable/rounded_square_border"
-                android:elevation="3dp"
-                android:hint="@string/enter_name"
-                android:inputType="textEmailAddress"
-                android:outlineProvider="background"
-                android:paddingLeft="16sp"
-                android:paddingRight="16sp"
-                android:textSize="14sp" />
+                android:layout_height="78dp"
+                android:orientation="vertical">
 
-        </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="17dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/name"
+                    android:textColor="@color/black"
+                    android:textSize="20sp" />
 
-        <LinearLayout
-            android:id="@+id/frameLayout3"
-            android:layout_width="339dp"
-            android:layout_height="78dp"
-            android:layout_marginTop="21dp"
-            android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/frameLayout2">
+                <EditText
+                    android:id="@+id/name_equipment_input"
+                    android:layout_width="339dp"
+                    android:layout_height="48dp"
+                    android:autofillHints="emailAddress"
+                    android:background="@drawable/rounded_square_border"
+                    android:elevation="3dp"
+                    android:hint="@string/enter_name"
+                    android:inputType="textEmailAddress"
+                    android:outlineProvider="background"
+                    android:paddingLeft="16sp"
+                    android:paddingRight="16sp"
+                    android:textSize="14sp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="17dp"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/last_name"
-                android:textColor="@color/black"
-                android:textSize="20sp" />
+            </LinearLayout>
 
-            <EditText
-                android:id="@+id/lastNameInput"
+            <LinearLayout
+                android:id="@+id/frameLayout3"
                 android:layout_width="339dp"
-                android:layout_height="48dp"
-                android:autofillHints="emailAddress"
-                android:background="@drawable/rounded_square_border"
-                android:elevation="3dp"
-                android:hint="@string/enter_last_name"
-                android:inputType="textEmailAddress"
-                android:outlineProvider="background"
-                android:paddingLeft="16sp"
-                android:paddingRight="16sp"
-                android:textSize="14sp" />
+                android:layout_height="78dp"
+                android:layout_marginTop="21dp"
+                android:orientation="vertical">
 
-        </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="17dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/last_name"
+                    android:textColor="@color/black"
+                    android:textSize="20sp" />
 
-        <LinearLayout
-            android:id="@+id/frameLayout4"
-            android:layout_width="339dp"
-            android:layout_height="78dp"
-            android:layout_marginTop="21dp"
-            android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/frameLayout2">
+                <EditText
+                    android:id="@+id/lastNameInput"
+                    android:layout_width="339dp"
+                    android:layout_height="48dp"
+                    android:autofillHints="emailAddress"
+                    android:background="@drawable/rounded_square_border"
+                    android:elevation="3dp"
+                    android:hint="@string/enter_last_name"
+                    android:inputType="textEmailAddress"
+                    android:outlineProvider="background"
+                    android:paddingLeft="16sp"
+                    android:paddingRight="16sp"
+                    android:textSize="14sp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="17dp"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/birthday_date"
-                android:textColor="@color/black"
-                android:textSize="20sp" />
+            </LinearLayout>
 
-            <EditText
-                android:id="@+id/dateInput"
+            <LinearLayout
                 android:layout_width="339dp"
-                android:layout_height="48dp"
-                android:autofillHints="none"
-                android:background="@drawable/rounded_square_border"
-                android:drawableEnd="@drawable/ic_calendar"
-                android:elevation="3dp"
-                android:hint="@string/enter_date"
-                android:inputType="date"
-                android:outlineProvider="background"
-                android:paddingLeft="16sp"
-                android:paddingRight="16sp"
-                android:textSize="14sp"
-                android:clickable="true"
-                android:focusable="false"/>
+                android:layout_height="78dp"
+                android:layout_marginTop="21dp"
+                android:orientation="vertical">
 
-        </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="17dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/birthday_date"
+                    android:textColor="@color/black"
+                    android:textSize="20sp" />
 
-        <LinearLayout
-            android:id="@+id/frameLayout5"
-            android:layout_width="339dp"
-            android:layout_height="78dp"
-            android:layout_marginTop="21dp"
-            android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/frameLayout4">
+                <EditText
+                    android:id="@+id/dateInput"
+                    android:layout_width="339dp"
+                    android:layout_height="48dp"
+                    android:autofillHints="none"
+                    android:background="@drawable/rounded_square_border"
+                    android:clickable="true"
+                    android:drawableEnd="@drawable/ic_calendar"
+                    android:elevation="3dp"
+                    android:focusable="false"
+                    android:hint="@string/enter_date"
+                    android:inputType="date"
+                    android:outlineProvider="background"
+                    android:paddingLeft="16sp"
+                    android:paddingRight="16sp"
+                    android:textSize="14sp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="17dp"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/email"
-                android:textColor="@color/black"
-                android:textSize="20sp" />
+            </LinearLayout>
 
-            <EditText
-                android:id="@+id/emailInput"
+            <LinearLayout
                 android:layout_width="339dp"
-                android:layout_height="48dp"
-                android:autofillHints="emailAddress"
-                android:background="@drawable/rounded_square_border"
-                android:elevation="3dp"
-                android:hint="@string/enter_email"
-                android:inputType="textEmailAddress"
-                android:outlineProvider="background"
-                android:paddingLeft="16sp"
-                android:paddingRight="16sp"
-                android:textSize="14sp" />
+                android:layout_height="78dp"
+                android:layout_marginTop="21dp"
+                android:orientation="vertical">
 
-        </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="17dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/email"
+                    android:textColor="@color/black"
+                    android:textSize="20sp" />
 
-        <LinearLayout
-            android:id="@+id/frameLayout6"
-            android:layout_width="339dp"
-            android:layout_height="78dp"
-            android:layout_marginTop="21dp"
-            android:layout_marginEnd="41dp"
-            android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/frameLayout5">
+                <EditText
+                    android:id="@+id/emailInput"
+                    android:layout_width="339dp"
+                    android:layout_height="48dp"
+                    android:autofillHints="emailAddress"
+                    android:background="@drawable/rounded_square_border"
+                    android:elevation="3dp"
+                    android:hint="@string/enter_email"
+                    android:inputType="textEmailAddress"
+                    android:outlineProvider="background"
+                    android:paddingLeft="16sp"
+                    android:paddingRight="16sp"
+                    android:textSize="14sp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="17dp"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/password"
-                android:textColor="@color/black"
-                android:textSize="20sp" />
+            </LinearLayout>
 
-            <EditText
-                android:id="@+id/passwordInput"
+            <LinearLayout
                 android:layout_width="339dp"
-                android:layout_height="48dp"
-                android:autofillHints="emailAddress"
-                android:background="@drawable/rounded_square_border"
-                android:elevation="3dp"
-                android:hint="@string/enter_password"
-                android:inputType="textPassword"
-                android:outlineProvider="background"
-                android:paddingLeft="16sp"
-                android:paddingRight="16sp"
-                android:textSize="14sp" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="21dp"
+                android:orientation="vertical">
 
-        </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="17dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/password"
+                    android:textColor="@color/black"
+                    android:textSize="20sp" />
 
-    </LinearLayout>
+                <EditText
+                    android:id="@+id/passwordInput"
+                    android:layout_width="339dp"
+                    android:layout_height="48dp"
+                    android:autofillHints="emailAddress"
+                    android:background="@drawable/rounded_square_border"
+                    android:elevation="3dp"
+                    android:hint="@string/enter_password"
+                    android:inputType="textPassword"
+                    android:outlineProvider="background"
+                    android:paddingLeft="16sp"
+                    android:paddingRight="16sp"
+                    android:textSize="14sp" />
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/alert_password"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"
+                    app:drawableStartCompat="@drawable/ic_error_outline_15dp" />
 
+            </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="33dp"
-        android:layout_marginBottom="67dp"
-        android:layout_marginEnd="40dp"
-        android:orientation="vertical"
-        android:gravity="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <FrameLayout
-            android:id="@+id/deleteUserButton"
-            android:layout_width="300dp"
-            android:layout_height="50dp"
-            android:background="@drawable/shape_btn_delete_user"
-            android:clickable="true"
-            android:elevation="3dp"
-            android:focusable="true">
-
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/delete_user"
-                android:textColor="@color/black"
-                android:textSize="20sp" />
+                android:layout_marginTop="14dp"
+                android:orientation="vertical">
 
-        </FrameLayout>
+                <FrameLayout
+                    android:id="@+id/deleteUserButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/shape_btn_delete_user"
+                    android:clickable="true"
+                    android:elevation="3dp"
+                    android:focusable="true">
 
-        <FrameLayout
-            android:id="@+id/savedChangesButton"
-            android:layout_width="339dp"
-            android:layout_height="57dp"
-            android:background="@drawable/rounded_button"
-            android:layout_marginTop="15dp"
-            android:layout_marginBottom="10dp"
-            android:clickable="true"
-            android:elevation="3dp"
-            android:focusable="true">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/delete_user"
+                        android:textColor="@color/black"
+                        android:textSize="20sp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/saved_changes"
-                android:textColor="@color/black"
-                android:textSize="24sp" />
+                </FrameLayout>
 
-        </FrameLayout>
+                <FrameLayout
+                    android:id="@+id/savedChangesButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="57dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginBottom="20dp"
+                    android:background="@drawable/rounded_button"
+                    android:clickable="true"
+                    android:elevation="3dp"
+                    android:focusable="true">
 
-    </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/saved_changes"
+                        android:textColor="@color/black"
+                        android:textSize="24sp" />
+
+                </FrameLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+
 
 
 

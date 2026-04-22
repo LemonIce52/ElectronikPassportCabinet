@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.androidx.cardview)
     implementation(libs.material.v1130)
     implementation(libs.zxing.android.embedded)
+    implementation(libs.jbcrypt)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

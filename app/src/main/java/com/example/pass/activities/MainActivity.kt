@@ -14,6 +14,7 @@ import com.example.pass.database.users.Role
 import com.example.pass.database.users.UsersEntity
 import com.example.pass.otherClasses.Animates
 import kotlinx.coroutines.launch
+import org.mindrot.jbcrypt.BCrypt
 import java.util.Calendar
 
 class MainActivity : AppCompatActivity() {
@@ -24,23 +25,7 @@ class MainActivity : AppCompatActivity() {
 
         val appDatabase: AppDatabase = AppDatabase.getDatabase(this)
 
-//        lifecycleScope.launch {
-//
-//            val calendar = Calendar.getInstance()
-//            calendar.set(2023, Calendar.DECEMBER, 31, 0, 0, 0)
-//            calendar.set(Calendar.MILLISECOND, 0)
-//
-//            val admin: UsersEntity = UsersEntity(
-//                name = "vas",
-//                lastName = "fag",
-//                birthday = calendar.time,
-//                email = "a@r",
-//                password = "1234",
-//                role = Role.ADMIN
-//            )
-//
-//            appDatabase.usersDao().savedUser(admin)
-//        }
+        createFirstUser(appDatabase)
 
         val emailInputEditText: EditText = findViewById(R.id.emailInput)
         val passwordInputEditText: EditText = findViewById(R.id.passwordInput)
@@ -76,9 +61,9 @@ class MainActivity : AppCompatActivity() {
                 return@launch
             }
 
-            val user: UsersEntity? = database.usersDao().getUser(email, password)
+            val user: UsersEntity? = database.usersDao().getUser(email)
 
-            if (user != null) {
+            if (user != null && checkPass(password, user.password)) {
                 val nextActivity = when (user.role) {
                     Role.ADMIN -> AdminActivity::class.java
                     Role.TECH_SPECIALIST -> SpecialistActivity::class.java
@@ -97,10 +82,35 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun checkPass(enterPassword: String, hashedPassword: String): Boolean {
+        return BCrypt.checkpw(enterPassword, hashedPassword)
+    }
+
     private fun emailValidation(email: String): String {
         if (email.isEmpty()) return "Почта не может быть пустой!"
         if (!email.contains('@')) return "Почта должна содержать @!"
 
         return ""
+    }
+
+    private fun createFirstUser(database: AppDatabase) {
+        lifecycleScope.launch {
+            if (database.usersDao().getFirstUser() >= 1) return@launch
+
+            val calendar = Calendar.getInstance()
+            calendar.set(2023, Calendar.DECEMBER, 31, 0, 0, 0)
+            calendar.set(Calendar.MILLISECOND, 0)
+
+            val admin= UsersEntity(
+                name = "admin",
+                lastName = "admin",
+                birthday = calendar.time,
+                email = "admin@admin",
+                password = BCrypt.hashpw("12345678", BCrypt.gensalt()),
+                role = Role.ADMIN
+            )
+
+            database.usersDao().savedUser(admin)
+        }
     }
 }
