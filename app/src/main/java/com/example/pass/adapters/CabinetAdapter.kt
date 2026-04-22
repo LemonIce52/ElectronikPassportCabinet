@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pass.R
-import com.example.pass.activities.Animates
+import com.example.pass.otherClasses.Animates
 import com.example.pass.database.cabinets.CabinetEntity
 
 class CabinetAdapter(private val callback: (Long) -> Unit) : ListAdapter<CabinetEntity, CabinetAdapter.CabinetViewHolder>(CabinetDiffCallback()) {

@@ -239,7 +239,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/alert_eqioment_edit"
+                        android:text="@string/alert_equipment_edit"
                         android:fontFamily="sans-serif-medium"
                         android:textColor="@color/black"
                         android:textSize="14sp"

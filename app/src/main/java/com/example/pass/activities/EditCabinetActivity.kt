@@ -15,7 +15,7 @@ import com.example.pass.database.cabinets.CabinetEntity
 import com.example.pass.database.cabinets.TypeCabinet
 import com.example.pass.dialog.CloseDialog
 import com.example.pass.dialog.DeleteCabinetDialog
-import com.example.pass.dialog.DeleteEquipmentDialog
+import com.example.pass.otherClasses.Animates
 import kotlinx.coroutines.launch
 
 class EditCabinetActivity : AppCompatActivity() {
@@ -111,6 +111,31 @@ class EditCabinetActivity : AppCompatActivity() {
         lengthInput: EditText
     ) {
         lifecycleScope.launch {
+            if (nameInput.text.isEmpty()) {
+                nameInput.error = "Название не может быть пустым"
+                return@launch
+            }
+
+            if (database.cabinetDao().getCountCabinetForNameEdit(nameInput.text.toString(), cabinetId) > 0) {
+                nameInput.error = "Имя кабинета должно быть уникальным!"
+                return@launch
+            }
+
+            if (widthInput.text.isEmpty() || widthInput.text.toString().toIntOrNull() == null || widthInput.text.toString().toInt() <= 0) {
+                widthInput.error = "Ширина не может быть пустой, меньшей или равной 0!"
+                return@launch
+            }
+
+            if (heightInput.text.isEmpty() || heightInput.text.toString().toIntOrNull() == null || heightInput.text.toString().toInt() <= 0) {
+                heightInput.error = "Высота не может быть пустой, меньшей или равной 0!"
+                return@launch
+            }
+
+            if (lengthInput.text.isEmpty() || lengthInput.text.toString().toIntOrNull() == null || lengthInput.text.toString().toInt() <= 0) {
+                lengthInput.error = "Длинна не может быть пустой, меньшей или равной 0!"
+                return@launch
+            }
+
             val cabinet: CabinetEntity? = database.cabinetDao().getCabinetById(cabinetId)
 
             if (cabinet != null) {
@@ -125,6 +150,12 @@ class EditCabinetActivity : AppCompatActivity() {
 
                 if (cabinet != currEntityCabinet) {
                     database.cabinetDao().updateCabinet(currEntityCabinet)
+
+                    Toast.makeText(
+                        this@EditCabinetActivity, "Данные кабинета успешно изменены!",
+                        Toast.LENGTH_LONG
+                    ).show()
+
                     finish()
                 } else {
                     Toast.makeText(this@EditCabinetActivity, "Данные не был изменены!",

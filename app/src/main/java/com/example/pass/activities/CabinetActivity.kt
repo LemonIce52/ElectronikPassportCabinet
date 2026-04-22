@@ -22,6 +22,7 @@ import com.example.pass.R
 import com.example.pass.adapters.EquipmentAdapter
 import com.example.pass.database.AppDatabase
 import com.example.pass.database.cabinets.CabinetEntity
+import com.example.pass.otherClasses.Animates
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,6 +30,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class CabinetActivity : AppCompatActivity() {
@@ -36,13 +38,7 @@ class CabinetActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cabinet)
 
-        val cabinetId: Long = intent.getLongExtra("cabinetId", - 1)
-
-        if (cabinetId == -1L) {
-            Toast.makeText(this, "Произошла ошибка!", Toast.LENGTH_LONG).show()
-            finish()
-        }
-
+        val cabinetId: Long = intent.getLongExtra("cabinetId", -1)
         val database: AppDatabase = AppDatabase.getDatabase(this)
 
         val nameActivity: TextView = findViewById(R.id.nameActivityCabinet)
@@ -52,7 +48,18 @@ class CabinetActivity : AppCompatActivity() {
         val lengthText: TextView = findViewById(R.id.length)
         val areaText: TextView = findViewById(R.id.area)
 
-        setData(
+        val returnButton: ImageView = findViewById(R.id.returnButton)
+        val editButton: ImageView = findViewById(R.id.editButton)
+        val getQrButton: FrameLayout = findViewById(R.id.getQrButton)
+        val assigningStartActivityButton: FrameLayout = findViewById(R.id.assigningStartActivity)
+        val unpinStartActivityButton: FrameLayout = findViewById(R.id.unpinEquipmentButton)
+
+        if (cabinetId == -1L) {
+            Toast.makeText(this, "Произошла ошибка!", Toast.LENGTH_LONG).show()
+            finish()
+        }
+
+        setDataOnCabinet(
             database,
             cabinetId,
             nameActivity,
@@ -64,10 +71,6 @@ class CabinetActivity : AppCompatActivity() {
         )
 
         createList(database, cabinetId)
-
-        val returnButton: ImageView = findViewById(R.id.returnButton)
-        val editButton: ImageView = findViewById(R.id.editButton)
-        val getQrButton: FrameLayout = findViewById(R.id.getQrButton)
 
         returnButton.setOnClickListener {
             Animates().animatesButton(it) {
@@ -86,6 +89,76 @@ class CabinetActivity : AppCompatActivity() {
                 generateQrAndDownload(database, cabinetId)
             }
         }
+
+        assigningStartActivityButton.setOnClickListener {
+            Animates().animatesButton(it) {
+                assigningStart(cabinetId)
+            }
+        }
+
+        unpinStartActivityButton.setOnClickListener {
+            Animates().animatesButton(it) {
+                unpinStart(cabinetId)
+            }
+        }
+    }
+
+    private fun setDataOnCabinet(
+        database: AppDatabase,
+        cabinetId: Long,
+        nameActivity: TextView,
+        typeText: TextView,
+        widthText: TextView,
+        heightText: TextView,
+        lengthText: TextView,
+        areaText: TextView
+    ) {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                database.cabinetDao().getCabinetByIdFlow(cabinetId).collect { cabinet ->
+
+                    if (cabinet != null) {
+                        nameActivity.text = cabinet.name
+                        typeText.text = this@CabinetActivity.getString(
+                            R.string.equipment_type_text,
+                            cabinet.typeCabinet.nameDescription
+                        )
+                        widthText.text = this@CabinetActivity.getString(
+                            R.string.equipment_width_text,
+                            cabinet.width
+                        )
+                        heightText.text = this@CabinetActivity.getString(
+                            R.string.equipment_height_text,
+                            cabinet.height
+                        )
+                        lengthText.text = this@CabinetActivity.getString(
+                            R.string.equipment_length_text,
+                            cabinet.length
+                        )
+                        areaText.text = this@CabinetActivity.getString(
+                            R.string.equipment_area_text,
+                            cabinet.width.toLong() * cabinet.length.toLong()
+                        )
+                    } else {
+                        Toast.makeText(this@CabinetActivity, "Произошла ошибка!", Toast.LENGTH_LONG)
+                            .show()
+                        finish()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun unpinStart(cabinetId: Long) {
+        val intent = Intent(this, UnpinEquipmentToCabinetActivity::class.java)
+        intent.putExtra("cabinetId", cabinetId)
+        startActivity(intent)
+    }
+
+    private fun assigningStart(cabinetId: Long) {
+        val intent = Intent(this, AssigningEquipmentToCabinetActivity::class.java)
+        intent.putExtra("cabinetId", cabinetId)
+        startActivity(intent)
     }
 
     private fun generateQrAndDownload(database: AppDatabase, cabinetId: Long) {
@@ -93,7 +166,7 @@ class CabinetActivity : AppCompatActivity() {
             val cabinet = database.cabinetDao().getCabinetById(cabinetId)
 
             if (cabinet != null) {
-                val qr: Bitmap? = generateQr("cabinet ${cabinet.name}")
+                val qr: Bitmap? = generateQr("cabinet:/:${cabinet.name}")
 
                 if (qr != null) {
                     downloadQr(this@CabinetActivity, qr, cabinet.name)
@@ -117,7 +190,10 @@ class CabinetActivity : AppCompatActivity() {
         val values = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, "${name}_qr.png")
             put(MediaStore.Images.Media.MIME_TYPE, "image/png")
-            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/${context.getString(R.string.app_name)}")
+            put(
+                MediaStore.Images.Media.RELATIVE_PATH,
+                "Pictures/${context.getString(R.string.app_name)}"
+            )
             put(MediaStore.Images.Media.IS_PENDING, 1)
         }
 
@@ -187,45 +263,6 @@ class CabinetActivity : AppCompatActivity() {
             }
         }
 
-    }
-
-    private fun setData(
-        database: AppDatabase,
-        cabinetId: Long,
-        nameActivity: TextView,
-        typeText: TextView,
-        widthText: TextView,
-        heightText: TextView,
-        lengthText: TextView,
-        areaText: TextView
-    ) {
-        lifecycleScope.launch {
-            val cabinet: CabinetEntity? = database.cabinetDao().getCabinetById(cabinetId)
-
-            if (cabinet != null) {
-                nameActivity.text = cabinet.name
-                typeText.text = this@CabinetActivity.getString(
-                    R.string.equipment_type_text,
-                    cabinet.typeCabinet.nameDescription
-                )
-                widthText.text = this@CabinetActivity.getString(
-                    R.string.equipment_width_text,
-                    cabinet.width
-                )
-                heightText.text = this@CabinetActivity.getString(
-                    R.string.equipment_height_text,
-                    cabinet.height
-                )
-                lengthText.text = this@CabinetActivity.getString(
-                    R.string.equipment_length_text,
-                    cabinet.length
-                )
-                areaText.text = this@CabinetActivity.getString(
-                    R.string.equipment_area_text,
-                    cabinet.height.toLong() * cabinet.length.toLong()
-                )
-            }
-        }
     }
 
     private fun returnActivity() {

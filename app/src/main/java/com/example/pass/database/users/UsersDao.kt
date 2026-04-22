@@ -29,6 +29,12 @@ interface UsersDao {
     @Query("SELECT COUNT(*) FROM User WHERE password = :password")
     suspend fun getUsersOnPassword(password: String): Int
 
+    @Query("SELECT COUNT(*) FROM User WHERE email = :email AND userId <> :userId")
+    suspend fun getUsersOnEmailEdit(email: String, userId: Long): Int
+
+    @Query("SELECT COUNT(*) FROM User WHERE password = :password AND userId <> :userId")
+    suspend fun getUsersOnPasswordEdit(password: String, userId: Long): Int
+
     @Query("SELECT * FROM User WHERE userId = :userId")
     suspend fun getUserOnId(userId: Long): UsersEntity?
 

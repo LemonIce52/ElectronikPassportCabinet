@@ -10,8 +10,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pass.R
-import com.example.pass.activities.Animates
-import com.example.pass.activities.Buys
+import com.example.pass.otherClasses.Animates
+import com.example.pass.otherClasses.Buys
 
 class BuysAdapter(
     private val onDeleteClick: (Int) -> Unit // Передаем позицию для удаления

@@ -6,6 +6,8 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
+import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.FrameLayout
@@ -22,6 +24,7 @@ import com.example.pass.database.equipment.EquipmentType
 import com.example.pass.database.equipment.StateEquipment
 import com.example.pass.dialog.CloseDialog
 import com.example.pass.dialog.DeleteEquipmentDialog
+import com.example.pass.otherClasses.Animates
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import kotlinx.coroutines.launch
@@ -119,13 +122,14 @@ class EditEquipmentActivity : AppCompatActivity() {
             val equipment = database.equipmentDao().getEquipmentById(equipmentId)
 
             if (equipment != null) {
-                val qr: Bitmap? = generateQr("equipment ${equipment.identificationNumber}")
+                val qr: Bitmap? = generateQr("equipment:/:${equipment.identificationNumber}")
 
                 if (qr != null) {
                     downloadQr(this@EditEquipmentActivity, qr, equipment.identificationNumber)
                 } else {
                     Toast.makeText(
-                        this@EditEquipmentActivity, "Произошла ошибка, не получилось достать qr код!",
+                        this@EditEquipmentActivity,
+                        "Произошла ошибка, не получилось достать qr код!",
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -143,7 +147,10 @@ class EditEquipmentActivity : AppCompatActivity() {
         val values = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, "${name}_qr.png")
             put(MediaStore.Images.Media.MIME_TYPE, "image/png")
-            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/${context.getString(R.string.app_name)}")
+            put(
+                MediaStore.Images.Media.RELATIVE_PATH,
+                "Pictures/${context.getString(R.string.app_name)}"
+            )
             put(MediaStore.Images.Media.IS_PENDING, 1)
         }
 
@@ -195,6 +202,25 @@ class EditEquipmentActivity : AppCompatActivity() {
         callback: () -> Unit
     ) {
         lifecycleScope.launch {
+
+            if (nameEquipmentInput.text.isEmpty()) {
+                Toast.makeText(this@EditEquipmentActivity, "Наименование не может быть пустым!",
+                    Toast.LENGTH_LONG).show()
+                return@launch
+            }
+
+            if (identificationNumberInput.text.isEmpty()) {
+                identificationNumberInput.error = "Номер оборудования не может быть пустой!"
+                return@launch
+            }
+
+            if (database.equipmentDao()
+                    .getCountOnNumberEdit(identificationNumberInput.text.toString(), equipmentId) > 0
+            ) {
+                identificationNumberInput.error = "Номер оборудования должен быть уникальным!"
+                return@launch
+            }
+
             val equipmentDb: EquipmentEntity? =
                 database.equipmentDao().getEquipmentById(equipmentId)
 
@@ -210,18 +236,17 @@ class EditEquipmentActivity : AppCompatActivity() {
                     listState[stateEquipmentSpinner.selectedItemPosition],
                     equipmentDb.cabinetId,
                     equipmentDb.equipmentType,
-                    equipmentDb.lastDateCheck
+                    Date()
                 )
 
-                if (equipmentEdits != equipmentDb) {
-                    database.equipmentDao().updateEquipment(equipmentEdits)
-                    callback()
-                } else {
-                    Toast.makeText(
-                        this@EditEquipmentActivity, "Данные оборудования небыли изменены!",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
+                database.equipmentDao().updateEquipment(equipmentEdits)
+
+                Toast.makeText(
+                    this@EditEquipmentActivity, "Данные оборудования успешно изменены!",
+                    Toast.LENGTH_LONG
+                ).show()
+
+                callback()
             } else {
                 Toast.makeText(
                     this@EditEquipmentActivity, "Произошла ошибка или оборудование было удаленно!",
@@ -302,11 +327,26 @@ class EditEquipmentActivity : AppCompatActivity() {
 
         val list = stateList.map { it.nameDescription }
 
-        val stateEquipmentAdapter = ArrayAdapter<String>(
+        val stateEquipmentAdapter = object : ArrayAdapter<String>(
             this,
             android.R.layout.simple_spinner_item,
             list
-        )
+        ) {
+            override fun getDropDownView(
+                position: Int,
+                convertView: View?,
+                parent: ViewGroup
+            ): View {
+                return if (position == 0) {
+                    View(context).apply {
+                        layoutParams = LayoutParams(0, 0)
+                        visibility = View.GONE
+                    }
+                } else {
+                    super.getDropDownView(position, null, parent)
+                }
+            }
+        }
 
         stateEquipmentAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
@@ -353,8 +393,8 @@ class EditEquipmentActivity : AppCompatActivity() {
                     groupSpinner.setSelection(position)
                 }
 
-                val adapter = stateSpinner.adapter as ArrayAdapter<StateEquipment>
-                val position = adapter.getPosition(equipment.stateEquipment)
+                val adapter = stateSpinner.adapter as ArrayAdapter<String>
+                val position = adapter.getPosition(equipment.stateEquipment.nameDescription)
                 stateSpinner.setSelection(position)
             }
         }

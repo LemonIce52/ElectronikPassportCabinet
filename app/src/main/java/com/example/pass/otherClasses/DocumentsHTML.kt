@@ -1,5 +1,6 @@
-package com.example.pass.activities
+package com.example.pass.otherClasses
 
+import com.example.pass.database.equipment.EquipmentEntity
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -166,4 +167,165 @@ class DocumentsHTML {
     """.trimIndent()
     }
 
+    fun generateWriteOfActHtml(
+        items: List<EquipmentEntity>,
+    ): String {
+        val currentDate = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(Date())
+
+        val tableRows = items.joinToString("") { item ->
+            """
+        <tr>
+            <td>${item.name}</td>
+            <td style="text-align: center;">${item.identificationNumber}</td>
+        </tr>
+        """.trimIndent()
+        }
+
+        return """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body { font-family: "Times New Roman", serif; color: #000; padding: 40px; line-height: 1.5; }
+            .org-header { text-align: left; margin-bottom: 40px; font-size: 10pt; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 10px; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .title { font-size: 16pt; font-weight: bold; margin-bottom: 5px; }
+            
+            .intro { margin-bottom: 20px; text-align: justify; text-indent: 30px; }
+            
+            .items-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+            .items-table th { background-color: #f5f5f5; font-weight: bold; text-align: center; }
+            .items-table td, .items-table th { padding: 10px; border: 1px solid #000; font-size: 11pt; }
+            
+            .sig-table { width: 100%; margin-top: 50px; border: none; }
+            .sig-table td { border: none; padding: 15px 0; }
+        </style>
+    </head>
+    <body>
+        <div class="org-header">
+            Наименование организации: ЧУ ВО «Московская академия предпринимательства»<br>
+            Адрес: Планетная улица, 36, Москва, 125319
+        </div>
+
+        <div class="header">
+            <div class="title">ЗАКЛЮЧЕНИЕ О ТЕХНИЧЕСКОМ СОСТОЯНИИ</div>
+            <div style="font-size: 14pt;">(АКТ СПИСАНИЯ)</div>
+            <div>от $currentDate г.</div>
+        </div>
+
+        <div class="intro">
+            Настоящий документ составлен техническим специалистом по результатам проверки состояния оборудования. В ходе осмотра установлено, что перечисленные ниже объекты <b>перестали работать и являются полностью неремонтопригодными</b>. Восстановление работоспособности признано невозможным или экономически нецелесообразным.
+        </div>
+
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>Наименование оборудования</th>
+                    <th style="width: 30%;">Инвентарный номер</th>
+                </tr>
+            </thead>
+            <tbody>
+                $tableRows
+            </tbody>
+        </table>
+
+        <div class="intro">
+            Оборудование подлежит списанию с баланса организации и последующей утилизации.
+        </div>
+
+        <table class="sig-table">
+            <tr>
+                <td style="width: 40%;">Технический специалист:</td>
+                <td>________________ / ____________ /</td>
+            </tr>
+            <tr>
+                <td style="font-size: 8pt;">(должность)</td>
+                <td style="font-size: 8pt;">(подпись / расшифровка)</td>
+            </tr>
+        </table>
+    </body>
+    </html>
+    """.trimIndent()
+    }
+
+    fun generateAcceptanceActHtml(
+        items: List<EquipmentEntity>,
+    ): String {
+        val currentDate = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(Date())
+
+        val tableRows = items.joinToString("") { item ->
+            """
+        <tr>
+            <td>${item.name}</td>
+            <td style="text-align: center;">${item.identificationNumber}</td>
+        </tr>
+        """.trimIndent()
+        }
+
+        return """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body { font-family: "Times New Roman", serif; color: #000; padding: 40px; line-height: 1.5; }
+            .org-header { text-align: left; margin-bottom: 40px; font-size: 10pt; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 10px; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .title { font-size: 16pt; font-weight: bold; margin-bottom: 5px; }
+            
+            .intro { margin-bottom: 20px; text-align: justify; text-indent: 30px; }
+            
+            .items-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+            .items-table th { background-color: #f5f5f5; font-weight: bold; text-align: center; }
+            .items-table td, .items-table th { padding: 10px; border: 1px solid #000; font-size: 11pt; }
+            
+            .sig-table { width: 100%; margin-top: 50px; border: none; }
+            .sig-table td { border: none; padding: 15px 0; }
+        </style>
+    </head>
+    <body>
+        <div class="org-header">
+            Наименование организации: ЧУ ВО «Московская академия предпринимательства»<br>
+            Адрес: Планетная улица, 36, Москва, 125319
+        </div>
+
+        <div class="header">
+            <div class="title">АКТ ПРИЕМА-ПЕРЕДАЧИ ОБОРУДОВАНИЯ</div>
+            <div style="font-size: 14pt;">(ВВОД В ЭКСПЛУАТАЦИЮ)</div>
+            <div>от $currentDate г.</div>
+        </div>
+
+        <div class="intro">
+            Настоящий акт подтверждает факт приема и постановки на учет перечисленного ниже оборудования. В ходе осмотра и проверки работоспособности установлено, что оборудование находится в исправном состоянии, дефектов не имеет и готово к эксплуатации. <b>В таблице ниже указан присвоенный каждому объекту уникальный инвентарный номер</b> для последующего учета в организации.
+        </div>
+
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>Наименование оборудования</th>
+                    <th style="width: 35%;">Присвоенный инвентарный номер</th>
+                </tr>
+            </thead>
+            <tbody>
+                $tableRows
+            </tbody>
+        </table>
+
+        <div class="intro">
+            С момента подписания данного акта оборудование считается введенным в эксплуатацию и закрепляется за ответственным подразделением.
+        </div>
+
+        <table class="sig-table">
+            <tr>
+                <td style="width: 40%;">Технический специалист:</td>
+                <td>________________ / ____________ /</td>
+            </tr>
+            <tr>
+                <td style="font-size: 8pt;">(должность)</td>
+                <td style="font-size: 8pt;">(подпись / расшифровка)</td>
+            </tr>
+        </table>
+    </body>
+    </html>
+    """.trimIndent()
+    }
 }

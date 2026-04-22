@@ -22,6 +22,7 @@ import com.example.pass.R
 import com.example.pass.adapters.DocumentAdapter
 import com.example.pass.database.AppDatabase
 import com.example.pass.database.documents.TypeDocument
+import com.example.pass.otherClasses.Animates
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,18 +48,20 @@ class DocumentsActivity : AppCompatActivity() {
 
         createDocumentList(database, this, typeDocumentationList)
 
-        addDocumentsButton.setOnClickListener { Animates().animatesButton(it) { addDocumentsButton(this, currUserId) } }
+        addDocumentsButton.setOnClickListener { Animates().animatesButton(it) { addDocumentsButton(this, currUserId,
+            nameTypeDocumentationList as ArrayList<String>
+        ) } }
 
         returnButton.setOnClickListener {
             Animates().animatesButton(it) { finish() }
         }
     }
 
-    private fun addDocumentsButton(context: Context, currUserId: Long) {
+    private fun addDocumentsButton(context: Context, currUserId: Long, listName: ArrayList<String>) {
         val intent = Intent(context, CreateDocumentsActivity::class.java)
 
         intent.putExtra("currUserId", currUserId)
-        intent.putExtra("nameTypeDocumentsList", arrayListOf(TypeDocument.SHOPPING_PLAN.name, TypeDocument.FORECAST_OF_PLANNED_COSTS.name))
+        intent.putExtra("nameTypeDocumentsList", listName)
 
         startActivity(intent)
     }

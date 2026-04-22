@@ -1,7 +1,10 @@
 package com.example.pass.activities
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.EditText
@@ -17,19 +20,35 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import java.text.SimpleDateFormat
 import java.util.Locale
 import androidx.core.util.Pair
+import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.pass.adapters.AssigningAndUnpinAdapter
 import com.example.pass.adapters.BuysAdapter
 import com.example.pass.database.AppDatabase
 import com.example.pass.database.documents.DocumentEntity
+import com.example.pass.database.equipment.StateEquipment
 import com.example.pass.dialog.CloseDialog
+import com.example.pass.otherClasses.Animates
+import com.example.pass.otherClasses.Buys
+import com.example.pass.otherClasses.CheckedEquipment
+import com.example.pass.otherClasses.DocumentsHTML
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import java.util.Date
 
 class CreateDocumentsActivity : AppCompatActivity() {
+
+    val firstElement: String = "Выберете тип документа"
 
     private var selectionPeriod: Pair<Long, Long> = Pair(
         MaterialDatePicker.todayInUtcMilliseconds(),
@@ -42,6 +61,9 @@ class CreateDocumentsActivity : AppCompatActivity() {
 
         val panelPlanShopping: LinearLayout = findViewById(R.id.planPrice)
         val panelPlanBuying: LinearLayout = findViewById(R.id.buying)
+        val panelActs: LinearLayout = findViewById(R.id.actsPanel)
+
+        val adapterActs = AssigningAndUnpinAdapter()
 
         val nameTypeDocumentationList: List<String>? =
             intent.getStringArrayListExtra("nameTypeDocumentsList")
@@ -58,169 +80,278 @@ class CreateDocumentsActivity : AppCompatActivity() {
 
         val typeDocumentsSpinner: Spinner = findViewById(R.id.typeDocument)
         val closeButton: ImageView = findViewById(R.id.closeButton)
-        val createDocument: FrameLayout = findViewById(R.id.create_document)
+        val createDocumentButton: FrameLayout = findViewById(R.id.create_document)
         val period: EditText = findViewById(R.id.periodInput)
         val planPriceInput: EditText = findViewById(R.id.planPriceInput)
 
-        val nameOborudInput: EditText = findViewById(R.id.name_equipment_input)
+        val nameEquipmentInput: EditText = findViewById(R.id.name_equipment_input)
         val priceInput: EditText = findViewById(R.id.priceInput)
         val countInput: EditText = findViewById(R.id.countInput)
-        val listOborud: MutableList<Buys> = ArrayList()
-        val addOborudButton: FrameLayout = findViewById(R.id.addOborud)
+        val listToBuyEquipment: MutableList<Buys> = ArrayList()
+        val addEquipmentButton: FrameLayout = findViewById(R.id.addOborud)
         val recyclerItems: RecyclerView = findViewById(R.id.oborudViewer)
 
         lateinit var adapter: BuysAdapter
 
         adapter = BuysAdapter { position ->
-            listOborud.removeAt(position)
+            listToBuyEquipment.removeAt(position)
             adapter.notifyItemRemoved(position)
-            adapter.notifyItemRangeChanged(position, listOborud.size)
-            adapter.submitList(listOborud.toList())
+            adapter.notifyItemRangeChanged(position, listToBuyEquipment.size)
+            adapter.submitList(listToBuyEquipment.toList())
         }
 
         recyclerItems.layoutManager = LinearLayoutManager(this)
         recyclerItems.adapter = adapter
 
-        addOborudButton.setOnClickListener {
+        addEquipmentButton.setOnClickListener {
             Animates().animatesButton(it) {
-                addOborud(listOborud, nameOborudInput, priceInput, countInput)
-                adapter.submitList(listOborud.toList())
+                addEquipment(listToBuyEquipment, nameEquipmentInput, priceInput, countInput)
+                adapter.submitList(listToBuyEquipment.toList())
             }
         }
 
         period.setOnClickListener {
-            val constraintsBuilder = CalendarConstraints.Builder()
-                .setValidator(DateValidatorPointForward.now())
-
-            val dateRangePicker = MaterialDatePicker.Builder.dateRangePicker()
-                .setTheme(R.style.MyDatePickerStyle)
-                .setTitleText("Выберите период")
-                .setSelection(selectionPeriod)
-                .setCalendarConstraints(constraintsBuilder.build())
-                .build()
-
-            dateRangePicker.show(supportFragmentManager, "range_picker")
-
-            dateRangePicker.addOnPositiveButtonClickListener { selection ->
-                val startDate = selection.first
-                val endDate = selection.second
-
-                selectionPeriod = Pair(
-                    startDate,
-                    endDate
-                )
-
-                val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-                val result = "${formatter.format(startDate)} - ${formatter.format(endDate)}"
-                period.setText(result)
-            }
+            createDialogDate(period)
         }
 
         createSpinnerDropDown(
+            database,
             typeDocumentationList,
             typeDocumentsSpinner,
             panelPlanBuying,
-            panelPlanShopping
+            panelPlanShopping,
+            panelActs,
+            adapterActs
         )
 
-        closeButton.setOnClickListener { Animates().animatesButton(it) { closeButton(listOborud, period, planPriceInput) } }
-        createDocument.setOnClickListener {
+        closeButton.setOnClickListener { Animates().animatesButton(it) { closeButton(listToBuyEquipment, period, planPriceInput) } }
+        createDocumentButton.setOnClickListener {
             Animates().animatesButton(it) {
-
-                val selectedItem: Int = typeDocumentsSpinner.selectedItemPosition
-
-                when (typeDocumentationList[selectedItem]) {
-                    TypeDocument.FORECAST_OF_PLANNED_COSTS -> {
-                        if (validationPeriodAndPlanPrice(planPriceInput, period)) return@animatesButton
-
-                        val documentHTML: String = DocumentsHTML().generateBudgetHtml(planPriceInput.text.toString(), period.text.toString())
-
-                        createDocument(
-                            database,
-                            typeDocumentationList[selectedItem],
-                            documentHTML,
-                            userId
-                        )
-                    }
-
-                    TypeDocument.SHOPPING_PLAN -> {
-                        if (listOborud.isEmpty()) {
-                            Toast.makeText(this, "Список добавленного оборудования пуст!", Toast.LENGTH_LONG).show()
-                            return@animatesButton
-                        }
-
-                        val documentHTML: String = DocumentsHTML().generatePurchaseReportHtml(listOborud)
-
-                        createDocument(
-                            database,
-                            typeDocumentationList[selectedItem],
-                            documentHTML,
-                            userId
-                        )
-                    }
-                    else -> {}
-                }
-
-                finish()
+                createDocument(
+                    typeDocumentsSpinner,
+                    typeDocumentationList,
+                    planPriceInput,
+                    period,
+                    database,
+                    userId,
+                    listToBuyEquipment,
+                    adapterActs
+                )
             }
         }
     }
 
-    private fun addOborud(
-        listOborud: MutableList<Buys>,
-        nameOborudInput: EditText,
+    private fun createDocument(
+        typeDocumentsSpinner: Spinner,
+        typeDocumentationList: List<TypeDocument>,
+        planPriceInput: EditText,
+        period: EditText,
+        database: AppDatabase,
+        userId: Long,
+        listToBuyEquipment: MutableList<Buys>,
+        adapterActs: AssigningAndUnpinAdapter
+    ) {
+        if (typeDocumentsSpinner.selectedItem.equals(firstElement)) {
+            Toast.makeText(this, "Нужно выбрать тип документа", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        val selectedItem: Int = typeDocumentsSpinner.selectedItemPosition - 1
+
+        when (typeDocumentationList[selectedItem]) {
+            TypeDocument.FORECAST_OF_PLANNED_COSTS -> {
+                if (validationPeriodAndPlanPrice(planPriceInput, period)) return
+
+                val documentHTML: String = DocumentsHTML().generateBudgetHtml(
+                    planPriceInput.text.toString(),
+                    period.text.toString()
+                )
+
+                addDocumentToDatabase(
+                    database,
+                    typeDocumentationList[selectedItem],
+                    documentHTML,
+                    userId
+                )
+            }
+
+            TypeDocument.SHOPPING_PLAN -> {
+                if (listToBuyEquipment.isEmpty()) {
+                    Toast.makeText(
+                        this,
+                        "Список добавленного оборудования пуст!",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    return
+                }
+
+                val documentHTML: String =
+                    DocumentsHTML().generatePurchaseReportHtml(listToBuyEquipment)
+
+                addDocumentToDatabase(
+                    database,
+                    typeDocumentationList[selectedItem],
+                    documentHTML,
+                    userId
+                )
+            }
+
+            TypeDocument.WRITE_OF_ACT -> {
+                val listSelected = adapterActs.currentList.filter { entity -> entity.isChecked }
+                    .map { entity -> entity.equipment }
+
+                if (listSelected.isEmpty()) {
+                    Toast.makeText(
+                        this,
+                        "Требуется выбрать оборудование для создания акта списания!",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    return
+                }
+
+                val documentHTML: String = DocumentsHTML().generateWriteOfActHtml(listSelected)
+
+                lifecycleScope.launch {
+                    database.equipmentDao()
+                        .deleteByIds(listSelected.map { entity -> entity.equipmentId })
+                }
+
+                addDocumentToDatabase(
+                    database,
+                    typeDocumentationList[selectedItem],
+                    documentHTML,
+                    userId
+                )
+            }
+
+            TypeDocument.ACT_OF_ACCEPTANCE -> {
+                val listSelected = adapterActs.currentList.filter { entity -> entity.isChecked }
+                    .map { entity -> entity.equipment }
+
+                if (listSelected.isEmpty()) {
+                    Toast.makeText(
+                        this,
+                        "Требуется выбрать оборудование для создания акта принятия!",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    return
+                }
+
+                val documentHTML: String = DocumentsHTML().generateAcceptanceActHtml(listSelected)
+
+                lifecycleScope.launch {
+                    database.equipmentDao().updateStateForWorkerOnEquipment(
+                        listSelected.map { entity -> entity.equipmentId },
+                        StateEquipment.WORKING
+                    )
+                }
+
+                addDocumentToDatabase(
+                    database,
+                    typeDocumentationList[selectedItem],
+                    documentHTML,
+                    userId
+                )
+            }
+        }
+
+        finish()
+    }
+
+    private fun createDialogDate(period: EditText) {
+        val constraintsBuilder = CalendarConstraints.Builder()
+            .setValidator(DateValidatorPointForward.now())
+
+        val dateRangePicker = MaterialDatePicker.Builder.dateRangePicker()
+            .setTheme(R.style.MyDatePickerStyle)
+            .setTitleText("Выберите период")
+            .setSelection(selectionPeriod)
+            .setCalendarConstraints(constraintsBuilder.build())
+            .build()
+
+        dateRangePicker.show(supportFragmentManager, "range_picker")
+
+        dateRangePicker.addOnPositiveButtonClickListener { selection ->
+            val startDate = selection.first
+            val endDate = selection.second
+
+            selectionPeriod = Pair(
+                startDate,
+                endDate
+            )
+
+            val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+            val result = "${formatter.format(startDate)} - ${formatter.format(endDate)}"
+            period.setText(result)
+        }
+    }
+
+    private fun addEquipment(
+        listEquipment: MutableList<Buys>,
+        nameEquipmentInput: EditText,
         priceInput: EditText,
         countInput: EditText
     ) {
 
-        if (nameOborudInput.text.isEmpty()) {
-            nameOborudInput.error = "Название не может быть пустым!"
-            return
-        }
-
-        if (priceInput.text.isEmpty()) {
-            priceInput.error = "Цена не может быть пустой!"
-            return
-        }
-
-        if (countInput.text.isEmpty()) {
-            countInput.error = "Количество не может быть пустым!"
-            return
-        }
-
         val price: Int? = priceInput.text.toString().toIntOrNull()
         val count: Int? = countInput.text.toString().toIntOrNull()
 
-        if (price == null) {
-            priceInput.error = "Не верный формат числа!"
-            return
-        }
+        if (validationDataInputs(nameEquipmentInput, priceInput, countInput, price, count)) return
 
-        if (price <= 0) {
-            priceInput.error = "Цена не может быть меньше или равной 0!"
-            return
-        }
+        val buys = Buys(nameEquipmentInput.text.toString(), count!!, price!!)
 
-        if (count == null) {
-            countInput.error = "Не верный формат числа!"
-            return
-        }
-
-        if (count <= 0) {
-            countInput.error = "Количество не может быть меньше или равно 0!"
-            return
-        }
-
-        val buys = Buys(nameOborudInput.text.toString(), count, price)
-
-        listOborud.forEach { element ->
+        listEquipment.forEach { element ->
             if (element.name == buys.name) {
                 Toast.makeText(this, "Оборудование с таким именем уже есть!", Toast.LENGTH_LONG).show()
                 return
             }
         }
 
-        listOborud.add(buys)
+        listEquipment.add(buys)
+    }
+
+    private fun validationDataInputs(
+        nameEquipmentInput: EditText,
+        priceInput: EditText,
+        countInput: EditText,
+        price: Int?,
+        count: Int?
+    ): Boolean {
+        if (nameEquipmentInput.text.isEmpty()) {
+            nameEquipmentInput.error = "Название не может быть пустым!"
+            return true
+        }
+
+        if (priceInput.text.isEmpty()) {
+            priceInput.error = "Цена не может быть пустой!"
+            return true
+        }
+
+        if (countInput.text.isEmpty()) {
+            countInput.error = "Количество не может быть пустым!"
+            return true
+        }
+
+        if (price == null) {
+            priceInput.error = "Не верный формат числа!"
+            return true
+        }
+
+        if (price <= 0) {
+            priceInput.error = "Цена не может быть меньше или равной 0!"
+            return true
+        }
+
+        if (count == null) {
+            countInput.error = "Не верный формат числа!"
+            return true
+        }
+
+        if (count <= 0) {
+            countInput.error = "Количество не может быть меньше или равно 0!"
+            return true
+        }
+        return false
     }
 
     private fun validationPeriodAndPlanPrice(
@@ -251,7 +382,7 @@ class CreateDocumentsActivity : AppCompatActivity() {
         return false
     }
 
-    private fun createDocument(
+    private fun addDocumentToDatabase(
         database: AppDatabase,
         typeDocument: TypeDocument,
         documentDescriptor: String,
@@ -271,16 +402,39 @@ class CreateDocumentsActivity : AppCompatActivity() {
     }
 
     private fun createSpinnerDropDown(
+        database: AppDatabase,
         typeDocumentationList: List<TypeDocument>,
         typeDocumentsSpinner: Spinner,
         panelPlanBuying: LinearLayout,
-        panelPlanShopping: LinearLayout
+        panelPlanShopping: LinearLayout,
+        panelActs: LinearLayout,
+        adapter: AssigningAndUnpinAdapter
     ) {
-        val typeDocumentsAdapter = ArrayAdapter(
+        val list = mutableListOf(firstElement)
+        typeDocumentationList.forEach {
+            list.add(it.nameDocument)
+        }
+
+        val typeDocumentsAdapter = object : ArrayAdapter<String>(
             this,
             android.R.layout.simple_spinner_item,
-            typeDocumentationList.map { it.nameDocument }
-        )
+            list
+        ) {
+            override fun getDropDownView(
+                position: Int,
+                convertView: View?,
+                parent: ViewGroup
+            ): View {
+                return if (position == 0) {
+                    View(context).apply {
+                        layoutParams = LayoutParams(0, 0)
+                        visibility = View.GONE
+                    }
+                } else {
+                    super.getDropDownView(position, null, parent)
+                }
+            }
+        }
 
         typeDocumentsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
@@ -289,12 +443,24 @@ class CreateDocumentsActivity : AppCompatActivity() {
 
         val listener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                if (typeDocumentsSpinner.selectedItem.equals(TypeDocument.SHOPPING_PLAN.nameDocument)) {
-                    panelPlanBuying.visibility = View.VISIBLE
-                    panelPlanShopping.visibility = View.GONE
-                } else {
-                    panelPlanBuying.visibility = View.GONE
-                    panelPlanShopping.visibility = View.VISIBLE
+
+                panelPlanShopping.visibility = View.GONE
+                panelPlanBuying.visibility = View.GONE
+                panelActs.visibility = View.GONE
+
+                when (typeDocumentsSpinner.selectedItem) {
+                    TypeDocument.SHOPPING_PLAN.nameDocument -> panelPlanBuying.visibility = View.VISIBLE
+                    TypeDocument.FORECAST_OF_PLANNED_COSTS.nameDocument -> panelPlanShopping.visibility = View.VISIBLE
+                    TypeDocument.ACT_OF_ACCEPTANCE.nameDocument -> {
+                        panelActs.visibility = View.VISIBLE
+                        createCardList(database, this@CreateDocumentsActivity, adapter,
+                            StateEquipment.NEW)
+                    }
+                    TypeDocument.WRITE_OF_ACT.nameDocument -> {
+                        panelActs.visibility = View.VISIBLE
+                        createCardList(database, this@CreateDocumentsActivity, adapter,
+                            StateEquipment.WRITTEN_OFF)
+                    }
                 }
             }
 
@@ -304,13 +470,41 @@ class CreateDocumentsActivity : AppCompatActivity() {
         typeDocumentsSpinner.onItemSelectedListener = listener
     }
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    private fun createCardList(database: AppDatabase, context: Context, adapter: AssigningAndUnpinAdapter, state: StateEquipment){
+        val recyclerView: RecyclerView = findViewById(R.id.equipmentActViewer)
+        val searchInput: EditText = findViewById(R.id.search_input_identification)
+
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        recyclerView.adapter = adapter
+
+        val searchQuery = MutableStateFlow("")
+
+        searchInput.addTextChangedListener {
+            searchQuery.value = it.toString()
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                searchQuery
+                    .debounce(150)
+                    .flatMapLatest { text ->
+                        database.equipmentDao().getEquipmentsByState(state, text)
+                    }
+                    .collect { list ->
+                        adapter.submitList(list.map { CheckedEquipment(it) })
+                    }
+            }
+        }
+    }
+
     private fun closeButton(
-        listOborud: MutableList<Buys>,
+        listEquipment: MutableList<Buys>,
         period: EditText,
         planPriceInput: EditText
     ) {
 
-        if (!listOborud.isEmpty() && !period.text.isEmpty() && !planPriceInput.text.isEmpty()) {
+        if (!listEquipment.isEmpty() && !period.text.isEmpty() && !planPriceInput.text.isEmpty()) {
             val dialog = CloseDialog()
             dialog.show(supportFragmentManager, "CloseDialog")
         } else {

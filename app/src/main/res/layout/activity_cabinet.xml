@@ -227,7 +227,7 @@
             android:layout_height="9dp" />
 
         <FrameLayout
-            android:id="@+id/addEquipmentButton"
+            android:id="@+id/assigningStartActivity"
             android:layout_width="63dp"
             android:layout_height="63dp"
             android:background="@drawable/rounded_button"
@@ -240,7 +240,7 @@
                 android:layout_height="48dp"
                 android:layout_gravity="center"
                 android:background="@drawable/ic_add_48px"
-                android:contentDescription="@string/add_documentation" />
+                android:contentDescription="@string/assigning_equipment_name" />
 
         </FrameLayout>
 

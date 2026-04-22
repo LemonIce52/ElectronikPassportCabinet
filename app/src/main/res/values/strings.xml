@@ -41,15 +41,14 @@
     <string name="alert_delete_user">Вы уверены, что хотите удалить пользователя?</string>
     <string name="return_btn">кнопка возврата</string>
     <string name="name_documentations">Отчетная документация</string>
-    <string name="enter_date_documents">Введите название отчета</string>
+    <string name="enter_date_documents">Введите название документа</string>
     <string name="add_documentation">Добавление документации</string>
     <string name="icn_download">Иконка скачивания</string>
     <string name="enter_on_download_document">нажмите чтобы скачать документ</string>
     <string name="date_created">Дата создания: %1$s</string>
     <string name="name_create_documents">Создание нового документа</string>
     <string name="document_type">Тип документа</string>
-    <string name="name_oborud">Название оборудования</string>
-    <string name="enter_name_oborud">Введите название оборудования</string>
+    <string name="name_equipment">Название оборудования</string>
     <string name="alert_document">Внимание! Данная панель доступна только при планах закупок</string>
     <string name="name_price">Цена</string>
     <string name="enter_price">Введите цену</string>
@@ -79,7 +78,7 @@
     <string name="enter_name_cabinet">Введите название кабинета</string>
     <string name="equipment">Оборудование</string>
     <string name="cabinet_type">Тип кабинета</string>
-    <string name="name_equipment">Список оборудования</string>
+    <string name="name_equipment_list">Список оборудования</string>
     <string name="enter_name_equipment">Введите название оборудования</string>
     <string name="equipment_type_text">Тип: %1$s</string>
     <string name="equipment_group_text">Ростовая группа: %1$s</string>
@@ -98,7 +97,7 @@
     <string name="enter_identification_equipment">Введите номер оборудования</string>
     <string name="add_equipment">Добавить оборудование</string>
     <string name="edit_data_equipment_name">Изменение данных о оборудовании</string>
-    <string name="alert_eqioment_edit">QR код формируется из номера оборудования. В случае смены номера оборудования QR код требуется также заменить.</string>
+    <string name="alert_equipment_edit">QR код формируется из номера оборудования. В случае смены номера оборудования QR код требуется также заменить.</string>
     <string name="delete_equipment_btn">Удалить оборудование</string>
     <string name="get_qr_code">Получить QR код</string>
     <string name="unpin_equipment">Открепить от кабинета</string>
@@ -111,4 +110,18 @@
     <string name="edit_data_cabinet_name">Изменение данных о кабинете</string>
     <string name="delete_cabinet">Удалить кабинет</string>
     <string name="alert_delete_cabinet">Вы уверены, что хотите удалить кабинет?</string>
+    <string name="assigning_equipment_name">Закрепление оборудования</string>
+    <string name="select_equipment">Выберите оборудование</string>
+    <string name="unpin_equipment_on_cabinet">Открепление оборудования</string>
+    <string name="unpin_equipment_to_cabinet_button">Открепить оборудование</string>
+    <string name="scanner_qr_name">Сканер QR кодов</string>
+    <string name="open_card_cabinet">Открыть карточку кабинета</string>
+    <string name="start_invent">Начать инвентаризацию</string>
+    <string name="edot_data">Редактирование данных</string>
+    <string name="alert_message_add_cabinet">Получить QR код для данного кабинета можно будет получить в карточке кабинета (нажать на название кабинета в меню). QR код формируется из названия кабинета. В случае смены названия кабинета QR код требуется также заменить.</string>
+    <string name="alert_edit_cabinet">QR код формируется из названия кабинета. В случае смены названия кабинета QR код требуется также заменить.</string>
+    <string name="border_camera">рамка камеры</string>
+    <string name="all_equipment_find">Все оборудование проверенно!</string>
+    <string name="end_invent">закончить инвентаризацию</string>
+    <string name="cabinet_name_activity_invent">Инвентаризация %1$s</string>
 </resources>

@@ -9,7 +9,6 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.Spinner
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -17,8 +16,8 @@ import com.example.pass.R
 import com.example.pass.database.AppDatabase
 import com.example.pass.database.cabinets.CabinetEntity
 import com.example.pass.database.cabinets.TypeCabinet
-import com.example.pass.database.documents.TypeDocument
 import com.example.pass.dialog.CloseDialog
+import com.example.pass.otherClasses.Animates
 import kotlinx.coroutines.launch
 
 class AddCabinetActivity : AppCompatActivity() {
@@ -64,9 +63,7 @@ class AddCabinetActivity : AppCompatActivity() {
                     heightInput,
                     lengthInput,
                     listTypes
-                ) {
-                    finish()
-                }
+                )
             }
         }
 
@@ -79,40 +76,19 @@ class AddCabinetActivity : AppCompatActivity() {
         widthInput: EditText,
         heightInput: EditText,
         lengthInput: EditText,
-        listType: List<TypeCabinet>,
-        function: () -> Unit
+        listType: List<TypeCabinet>
     ) {
 
         lifecycleScope.launch {
-            if (nameInput.text.isEmpty()) {
-                nameInput.error = "Название не может быть пустым"
-                return@launch
-            }
-
-            if (database.cabinetDao().getCabinetForName(nameInput.text.toString()) > 0) {
-                nameInput.error = "Имя кабинета должно быть уникальным!"
-                return@launch
-            }
-
-            if (typeInputs.selectedItem.equals(firstElementSpinner)) {
-                Toast.makeText(this@AddCabinetActivity, "Требуется выбрать тип кабинета", Toast.LENGTH_LONG).show()
-                return@launch
-            }
-
-            if (widthInput.text.isEmpty() || widthInput.text.toString().toIntOrNull() == null || widthInput.text.toString().toInt() <= 0) {
-                widthInput.error = "Ширина не может быть пустой, меньшей или равной 0!"
-                return@launch
-            }
-
-            if (heightInput.text.isEmpty() || heightInput.text.toString().toIntOrNull() == null || heightInput.text.toString().toInt() <= 0) {
-                heightInput.error = "Высота не может быть пустой, меньшей или равной 0!"
-                return@launch
-            }
-
-            if (lengthInput.text.isEmpty() || lengthInput.text.toString().toIntOrNull() == null || lengthInput.text.toString().toInt() <= 0) {
-                lengthInput.error = "Длинна не может быть пустой, меньшей или равной 0!"
-                return@launch
-            }
+            if (validationDataInputs(
+                    nameInput,
+                    database,
+                    typeInputs,
+                    widthInput,
+                    heightInput,
+                    lengthInput
+                )
+            ) return@launch
 
             val cabinet = CabinetEntity(
                 name = nameInput.text.toString(),
@@ -123,9 +99,59 @@ class AddCabinetActivity : AppCompatActivity() {
             )
 
             database.cabinetDao().saveCabinet(cabinet)
-            function()
+            finish()
         }
 
+    }
+
+    private suspend fun validationDataInputs(
+        nameInput: EditText,
+        database: AppDatabase,
+        typeInputs: Spinner,
+        widthInput: EditText,
+        heightInput: EditText,
+        lengthInput: EditText
+    ): Boolean {
+        if (nameInput.text.isEmpty()) {
+            nameInput.error = "Название не может быть пустым"
+            return true
+        }
+
+        if (database.cabinetDao().getCountCabinetForNameCreate(nameInput.text.toString()) > 0) {
+            nameInput.error = "Имя кабинета должно быть уникальным!"
+            return true
+        }
+
+        if (typeInputs.selectedItem.equals(firstElementSpinner)) {
+            Toast.makeText(
+                this@AddCabinetActivity,
+                "Требуется выбрать тип кабинета",
+                Toast.LENGTH_LONG
+            ).show()
+            return true
+        }
+
+        if (widthInput.text.isEmpty() || widthInput.text.toString()
+                .toIntOrNull() == null || widthInput.text.toString().toInt() <= 0
+        ) {
+            widthInput.error = "Ширина не может быть пустой, меньшей или равной 0!"
+            return true
+        }
+
+        if (heightInput.text.isEmpty() || heightInput.text.toString()
+                .toIntOrNull() == null || heightInput.text.toString().toInt() <= 0
+        ) {
+            heightInput.error = "Высота не может быть пустой, меньшей или равной 0!"
+            return true
+        }
+
+        if (lengthInput.text.isEmpty() || lengthInput.text.toString()
+                .toIntOrNull() == null || lengthInput.text.toString().toInt() <= 0
+        ) {
+            lengthInput.error = "Длинна не может быть пустой, меньшей или равной 0!"
+            return true
+        }
+        return false
     }
 
     private fun closeActivity(

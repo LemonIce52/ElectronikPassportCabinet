@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.pass.R
 import com.example.pass.database.AppDatabase
 import com.example.pass.database.users.UsersEntity
+import com.example.pass.otherClasses.Animates
 import kotlinx.coroutines.launch
 
 class DeleteUserDialog : DialogFragment() {
@@ -41,31 +42,28 @@ class DeleteUserDialog : DialogFragment() {
         val db: AppDatabase = AppDatabase.getDatabase(view.context)
 
         acceptButton.setOnClickListener {
-            it.animate()
-                .scaleX(0.95f)
-                .scaleY(0.95f)
-                .setDuration(100)
-                .withEndAction {
-                    it.animate()
-                        .scaleX(1f)
-                        .scaleY(1f)
-                        .setDuration(100)
-                        .start()
 
-                    if (userId != null) {
-                        lifecycleScope.launch {
-                            val userEntity: UsersEntity? = db.usersDao().getUserOnId(userId)
+            Animates().animatesButton(it) {
+                deleteUser(userId, db)
+                closeDialog()
+            }
+        }
+    }
 
-                            if (userEntity != null) {
-                                db.usersDao().deleteUser(userEntity)
-                            }
-                        }
-                    }
+    private fun closeDialog() {
+        dismiss()
+        activity?.finish()
+    }
 
-                    dismiss()
-                    activity?.finish()
+    private fun deleteUser(userId: Long?, db: AppDatabase) {
+        if (userId != null) {
+            lifecycleScope.launch {
+                val userEntity: UsersEntity? = db.usersDao().getUserOnId(userId)
+
+                if (userEntity != null) {
+                    db.usersDao().deleteUser(userEntity)
                 }
-                .start()
+            }
         }
     }
 

@@ -28,7 +28,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/name_equipment"
+            android:text="@string/name_equipment_list"
             android:layout_gravity="center"
             android:gravity="center"
             android:fontFamily="sans-serif-medium"

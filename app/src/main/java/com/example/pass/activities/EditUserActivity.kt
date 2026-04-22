@@ -13,6 +13,7 @@ import com.example.pass.database.users.Role
 import com.example.pass.database.users.UsersEntity
 import com.example.pass.dialog.CloseDialog
 import com.example.pass.dialog.DeleteUserDialog
+import com.example.pass.otherClasses.Animates
 import com.google.android.material.datepicker.MaterialDatePicker
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -26,19 +27,11 @@ class EditUserActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activiti_edit_user)
-
-        val userId = intent.getLongExtra("USER_ID", -1)
-        var currUserEntity: UsersEntity? = null
-        if (userId == -1L) finish()
+        setContentView(R.layout.activity_edit_user)
 
         val db: AppDatabase = AppDatabase.getDatabase(this)
-
-        lifecycleScope.launch {
-            db.usersDao().getUserOnIdFlow(userId).collect { latestUser ->
-                currUserEntity = latestUser
-            }
-        }
+        val userId = intent.getLongExtra("USER_ID", -1)
+        var currUserEntity: UsersEntity? = null
 
         val name: EditText = findViewById(R.id.name_equipment_input)
         val lastName: EditText = findViewById(R.id.lastNameInput)
@@ -46,23 +39,19 @@ class EditUserActivity : AppCompatActivity() {
         val password: EditText = findViewById(R.id.passwordInput)
         val dateInput: EditText = findViewById(R.id.dateInput)
 
-        dateInput.setOnClickListener {
-            val builder = MaterialDatePicker.Builder.datePicker()
-                .setTheme(R.style.MyDatePickerStyle)
-                .setTitleText("Выберете дату рождения")
-                .setSelection(selectedDateInMs)
+        val closeButton: ImageView = findViewById(R.id.closeButtonEdit)
+        val deleteButton: FrameLayout = findViewById(R.id.deleteUserButton)
+        val savedChangesButton: FrameLayout = findViewById(R.id.savedChangesButton)
 
-            val datePicker = builder.build()
+        if (userId == -1L) {
+            Toast.makeText(this, "Произошла ошибка или пользователь был удален!", Toast.LENGTH_LONG).show()
+            finish()
+        }
 
-            datePicker.show(supportFragmentManager, "DATE_PICKER")
 
-            datePicker.addOnPositiveButtonClickListener { selection ->
-                selectedDateInMs = selection
-
-                val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-                val dateString = formatter.format(Date(selection))
-
-                dateInput.setText(dateString)
+        lifecycleScope.launch {
+            db.usersDao().getUserOnIdFlow(userId).collect { latestUser ->
+                currUserEntity = latestUser
             }
         }
 
@@ -74,13 +63,11 @@ class EditUserActivity : AppCompatActivity() {
             email,
             password,
             dateInput
-        ) {
-            finish()
-        }
+        )
 
-        val closeButton: ImageView = findViewById(R.id.closeButtonEdit)
-        val deleteButton: FrameLayout = findViewById(R.id.deleteUserButton)
-        val savedChangesButton: FrameLayout = findViewById(R.id.savedChangesButton)
+        dateInput.setOnClickListener {
+            setDate(dateInput)
+        }
 
         closeButton.setOnClickListener {
             Animates().animatesButton(it) {
@@ -92,9 +79,7 @@ class EditUserActivity : AppCompatActivity() {
                     email,
                     password,
                     dateInput
-                ) {
-                    finish()
-                }
+                )
             }
         }
 
@@ -113,10 +98,28 @@ class EditUserActivity : AppCompatActivity() {
                     email,
                     password,
                     dateInput
-                ) {
-                    finish()
-                }
+                )
             }
+        }
+    }
+
+    private fun setDate(dateInput: EditText) {
+        val builder = MaterialDatePicker.Builder.datePicker()
+            .setTheme(R.style.MyDatePickerStyle)
+            .setTitleText("Выберете дату рождения")
+            .setSelection(selectedDateInMs)
+
+        val datePicker = builder.build()
+
+        datePicker.show(supportFragmentManager, "DATE_PICKER")
+
+        datePicker.addOnPositiveButtonClickListener { selection ->
+            selectedDateInMs = selection
+
+            val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+            val dateString = formatter.format(Date(selection))
+
+            dateInput.setText(dateString)
         }
     }
 
@@ -128,23 +131,30 @@ class EditUserActivity : AppCompatActivity() {
         lastName: EditText,
         email: EditText,
         password: EditText,
-        dateInput: EditText,
-        function: () -> Unit
+        dateInput: EditText
     ) {
-
-        val currUserEntity: UsersEntity? = getCreatedUserEntity(
-            userId,
-            dateInput,
-            name,
-            lastName,
-            email,
-            password
-        )
-
         lifecycleScope.launch {
+
+            val formater = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+            val date: Date? = formater.parse(dateInput.text.toString())
+
+            if (validationUserInputs(userId, email, db, name, lastName, date, password)) {
+                return@launch
+            }
+
+
+            val currUserEntity: UsersEntity? = getCreatedUserEntity(
+                userId,
+                dateInput,
+                name,
+                lastName,
+                email,
+                password
+            )
+
             if (userEntity != null && currUserEntity != null) {
 
-                if (!validationUserEntity(currUserEntity, userEntity)) {
+                if (currUserEntity != userEntity) {
 
                     db.usersDao().updateUserData(currUserEntity)
 
@@ -153,7 +163,7 @@ class EditUserActivity : AppCompatActivity() {
                         Toast.LENGTH_LONG
                     ).show()
 
-                    function()
+                    finish()
                 } else {
                     Toast.makeText(
                         this@EditUserActivity, "Данные пользователя не были изменены!",
@@ -165,7 +175,7 @@ class EditUserActivity : AppCompatActivity() {
                     this@EditUserActivity, "Произошла ошибка или пользователь был удален!",
                     Toast.LENGTH_LONG
                 ).show()
-                function()
+                finish()
             }
         }
     }
@@ -185,10 +195,10 @@ class EditUserActivity : AppCompatActivity() {
         lastName: EditText,
         email: EditText,
         password: EditText,
-        dateInput: EditText,
-        callback: () -> Unit
+        dateInput: EditText
     ) {
         val currUserEntity: UsersEntity? = getCreatedUserEntity(
+            userId = userId,
             birthday = dateInput,
             name = name,
             lastName = lastName,
@@ -200,27 +210,87 @@ class EditUserActivity : AppCompatActivity() {
             val userEntity: UsersEntity? = db.usersDao().getUserOnId(userId)
 
             if (userEntity != null && currUserEntity != null) {
-                if (!validationUserEntity(currUserEntity, userEntity)) {
+                if (userEntity == currUserEntity) {
                     val dialog = CloseDialog()
                     dialog.show(supportFragmentManager, "CloseDialog")
                 } else {
-                    callback()
+                    finish()
                 }
             } else {
-                callback()
+                finish()
             }
         }
     }
 
-    private fun validationUserEntity(
-        currUsersEntity: UsersEntity,
-        userEntity: UsersEntity
+    private suspend fun validationUserInputs(
+        userId: Long,
+        emailInput: EditText,
+        database: AppDatabase,
+        nameInput: EditText,
+        lastNameInput: EditText,
+        birthday: Date?,
+        passwordInput: EditText
     ): Boolean {
-        return currUsersEntity.name == userEntity.name &&
-                currUsersEntity.lastName == userEntity.lastName &&
-                currUsersEntity.birthday.time == userEntity.birthday.time &&
-                currUsersEntity.email == userEntity.email &&
-                currUsersEntity.password == userEntity.password
+        val errorMessage: String = emailValidation(emailInput.text.toString())
+
+        if (nameInput.text.isEmpty()) {
+            nameInput.error = "Имя не может быть пустым!"
+            return true
+        }
+
+        if (lastNameInput.text.isEmpty()) {
+            lastNameInput.error = "Фамилия не может быть пустым!"
+            return true
+        }
+
+        if (birthday == null) {
+            Toast.makeText(this, "Не верно ведена дата!", Toast.LENGTH_LONG).show()
+            return true
+        }
+
+        if (!isAdult(birthday)) {
+            Toast.makeText(this, "Пользователю меньше 18 лет!", Toast.LENGTH_LONG).show()
+            return true
+        }
+
+        if (!errorMessage.isEmpty()) {
+            emailInput.error = errorMessage
+            return true
+        }
+
+        if (database.usersDao().getUsersOnEmailEdit(emailInput.text.toString(), userId) > 0) {
+            emailInput.error = "Пользователь с такой почтой уже имеется!"
+            return true
+        }
+
+        if (passwordInput.text.isEmpty()) {
+            passwordInput.error = "Пароль не может быть пустым!"
+            return true
+        }
+
+        if (database.usersDao().getUsersOnPasswordEdit(passwordInput.text.toString(), userId) > 0) {
+            passwordInput.error = "Пароль занят придумайте другой!"
+            return true
+        }
+        return false
+    }
+
+    private fun emailValidation(email: String): String {
+        if (email.isEmpty()) return "Почта не может быть пустой!"
+        if (!email.contains('@')) return "Почта должна сожержать @!"
+
+        return ""
+    }
+
+    fun isAdult(birthdayDate: Date): Boolean {
+        val birthday = Calendar.getInstance()
+        birthday.time = birthdayDate
+
+        val cutOffDate = Calendar.getInstance()
+        cutOffDate.set(Calendar.MILLISECOND, 0)
+        cutOffDate.add(Calendar.YEAR, -18)
+
+        return birthday.before(cutOffDate)
     }
 
     private fun setData(
@@ -230,8 +300,7 @@ class EditUserActivity : AppCompatActivity() {
         lastName: EditText,
         email: EditText,
         password: EditText,
-        dateInput: EditText,
-        callback: () -> Unit
+        dateInput: EditText
     ) {
 
 
@@ -251,13 +320,13 @@ class EditUserActivity : AppCompatActivity() {
 
                 selectedDateInMs = birthday.time
             } else {
-                callback()
+                finish()
             }
         }
     }
 
     private fun getCreatedUserEntity(
-        userId: Long = -1,
+        userId: Long,
         birthday: EditText,
         name: EditText,
         lastName: EditText,

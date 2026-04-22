@@ -12,6 +12,7 @@ import com.example.pass.database.AppDatabase
 import com.example.pass.database.users.Role
 import com.example.pass.database.users.UsersEntity
 import com.example.pass.dialog.CloseDialog
+import com.example.pass.otherClasses.Animates
 import com.google.android.material.datepicker.MaterialDatePicker
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -39,26 +40,7 @@ class AddUserActivity : AppCompatActivity() {
         var birthday: Date? = null
 
         dateInput.setOnClickListener {
-            val builder = MaterialDatePicker.Builder.datePicker()
-                .setTheme(R.style.MyDatePickerStyle)
-                .setTitleText("Выберете дату рождения")
-                .setSelection(selectedDateInMs)
-
-            val datePicker = builder.build()
-
-            datePicker.show(supportFragmentManager, "DATE_PICKER")
-
-            datePicker.addOnPositiveButtonClickListener { selection ->
-                selectedDateInMs = selection
-                val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-                formatter.timeZone = TimeZone.getTimeZone("UTC")
-
-                val dateString = formatter.format(Date(selection))
-
-                dateInput.setText(dateString)
-
-                birthday = Date(selection)
-            }
+            birthday = inputDate(dateInput, birthday)
         }
 
         closeButton.setOnClickListener {
@@ -78,26 +60,46 @@ class AddUserActivity : AppCompatActivity() {
                 registerUser(
                     nameInput,
                     lastNameInput,
-                    dateInput,
                     birthday,
                     emailInput,
                     passwordInput
-                ) {
-                    finish()
-                }
+                )
             }
         }
 
     }
 
+    private fun inputDate(dateInput: EditText, birthday: Date?): Date? {
+        var currBirthday = birthday
+        val builder = MaterialDatePicker.Builder.datePicker()
+            .setTheme(R.style.MyDatePickerStyle)
+            .setTitleText("Выберете дату рождения")
+            .setSelection(selectedDateInMs)
+
+        val datePicker = builder.build()
+
+        datePicker.show(supportFragmentManager, "DATE_PICKER")
+
+        datePicker.addOnPositiveButtonClickListener { selection ->
+            selectedDateInMs = selection
+            val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+            formatter.timeZone = TimeZone.getTimeZone("UTC")
+
+            val dateString = formatter.format(Date(selection))
+
+            dateInput.setText(dateString)
+
+            currBirthday = Date(selection)
+        }
+        return currBirthday
+    }
+
     private fun registerUser(
         nameInput: EditText,
         lastNameInput: EditText,
-        dateInput: EditText,
         birthday: Date?,
         emailInput: EditText,
-        passwordInput: EditText,
-        callback: () -> Unit
+        passwordInput: EditText
     ) {
         lifecycleScope.launch {
 
@@ -105,21 +107,15 @@ class AddUserActivity : AppCompatActivity() {
             val name: String = nameInput.text.toString()
             val lastName: String = lastNameInput.text.toString()
 
-            val birthdayStr: String = dateInput.text.toString()
             val email: String = emailInput.text.toString()
             val password: String = passwordInput.text.toString()
 
             if (validationUserInputs(
-                    email,
                     emailInput,
                     database,
-                    name,
                     nameInput,
-                    lastName,
                     lastNameInput,
-                    birthdayStr,
                     birthday,
-                    password,
                     passwordInput
                 )
             ) return@launch
@@ -135,37 +131,27 @@ class AddUserActivity : AppCompatActivity() {
 
             database.usersDao().savedUser(userEntity)
 
-            callback()
+            finish()
         }
     }
 
     private suspend fun validationUserInputs(
-        email: String,
         emailInput: EditText,
         database: AppDatabase,
-        name: String,
         nameInput: EditText,
-        lastName: String,
         lastNameInput: EditText,
-        date: String,
         birthday: Date?,
-        password: String,
         passwordInput: EditText
     ): Boolean {
-        val errorMessage: String = emailValidation(email)
+        val errorMessage: String = emailValidation(emailInput.text.toString())
 
-        if (name.isEmpty()) {
+        if (nameInput.text.isEmpty()) {
             nameInput.error = "Имя не может быть пустым!"
             return true
         }
 
-        if (lastName.isEmpty()) {
+        if (lastNameInput.text.isEmpty()) {
             lastNameInput.error = "Фамилия не может быть пустым!"
-            return true
-        }
-
-        if (date.isEmpty()) {
-            Toast.makeText(this, "Дата рождения не может быть пустой!", Toast.LENGTH_LONG).show()
             return true
         }
 
@@ -184,17 +170,17 @@ class AddUserActivity : AppCompatActivity() {
             return true
         }
 
-        if (database.usersDao().getUsersOnEmail(email) > 0) {
+        if (database.usersDao().getUsersOnEmail(emailInput.text.toString()) > 0) {
             emailInput.error = "Пользователь с такой почтой уже имеется!"
             return true
         }
 
-        if (password.isEmpty()) {
+        if (passwordInput.text.isEmpty()) {
             passwordInput.error = "Пароль не может быть пустым!"
             return true
         }
 
-        if (database.usersDao().getUsersOnPassword(password) > 0) {
+        if (database.usersDao().getUsersOnPassword(passwordInput.text.toString()) > 0) {
             passwordInput.error = "Пароль занят придумайте другой!"
             return true
         }

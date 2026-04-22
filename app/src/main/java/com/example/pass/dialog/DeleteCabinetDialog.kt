@@ -12,6 +12,7 @@ import com.example.pass.R
 import com.example.pass.activities.SpecialistActivity
 import com.example.pass.database.AppDatabase
 import com.example.pass.database.cabinets.CabinetEntity
+import com.example.pass.otherClasses.Animates
 import kotlinx.coroutines.launch
 
 class DeleteCabinetDialog : DialogFragment() {
@@ -43,35 +44,31 @@ class DeleteCabinetDialog : DialogFragment() {
         val db: AppDatabase = AppDatabase.getDatabase(view.context)
 
         acceptButton.setOnClickListener {
-            it.animate()
-                .scaleX(0.95f)
-                .scaleY(0.95f)
-                .setDuration(100)
-                .withEndAction {
-                    it.animate()
-                        .scaleX(1f)
-                        .scaleY(1f)
-                        .setDuration(100)
-                        .start()
+            Animates().animatesButton(it) {
+                deleteCabinet(cabinetId, db)
+                closeDialog()
+            }
+        }
+    }
 
-                    if (cabinetId != null) {
-                        lifecycleScope.launch {
-                            val cabinetEntity: CabinetEntity? = db.cabinetDao().getCabinetById(cabinetId)
+    private fun closeDialog() {
+        val intent = Intent(requireContext(), SpecialistActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        }
 
-                            if (cabinetEntity != null) {
-                                db.cabinetDao().deleteCabinet(cabinetEntity)
-                            }
-                        }
-                    }
+        startActivity(intent)
+        dismiss()
+    }
 
-                    val intent = Intent(requireContext(), SpecialistActivity::class.java).apply {
-                        addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                    }
+    private fun deleteCabinet(cabinetId: Long?, db: AppDatabase) {
+        if (cabinetId != null) {
+            lifecycleScope.launch {
+                val cabinetEntity: CabinetEntity? = db.cabinetDao().getCabinetById(cabinetId)
 
-                    startActivity(intent)
-                    dismiss()
+                if (cabinetEntity != null) {
+                    db.cabinetDao().deleteCabinet(cabinetEntity)
                 }
-                .start()
+            }
         }
     }
 

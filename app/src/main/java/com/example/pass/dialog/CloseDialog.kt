@@ -8,6 +8,7 @@ import android.view.WindowManager
 import android.widget.FrameLayout
 import androidx.fragment.app.DialogFragment
 import com.example.pass.R
+import com.example.pass.otherClasses.Animates
 
 class CloseDialog : DialogFragment() {
     override fun onCreateView(
@@ -24,21 +25,10 @@ class CloseDialog : DialogFragment() {
         val acceptButton: FrameLayout = view.findViewById(R.id.acceptButton)
 
         acceptButton.setOnClickListener {
-            it.animate()
-                .scaleX(0.95f)
-                .scaleY(0.95f)
-                .setDuration(100)
-                .withEndAction {
-                    it.animate()
-                        .scaleX(1f)
-                        .scaleY(1f)
-                        .setDuration(100)
-                        .start()
-
-                    dismiss()
-                    activity?.finish()
-                }
-                .start()
+            Animates().animatesButton(it) {
+                dismiss()
+                activity?.finish()
+            }
         }
     }
 

@@ -12,6 +12,7 @@ import com.example.pass.R
 import com.example.pass.database.AppDatabase
 import com.example.pass.database.users.Role
 import com.example.pass.database.users.UsersEntity
+import com.example.pass.otherClasses.Animates
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -98,7 +99,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun emailValidation(email: String): String {
         if (email.isEmpty()) return "Почта не может быть пустой!"
-        if (!email.contains('@')) return "Почта должна сожержать @!"
+        if (!email.contains('@')) return "Почта должна содержать @!"
 
         return ""
     }

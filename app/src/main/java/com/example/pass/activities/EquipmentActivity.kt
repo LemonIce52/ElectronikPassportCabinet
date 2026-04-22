@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.pass.R
 import com.example.pass.adapters.EquipmentAdapter
 import com.example.pass.database.AppDatabase
+import com.example.pass.otherClasses.Animates
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow

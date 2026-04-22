@@ -110,6 +110,7 @@
             android:layout_height="9dp" />
 
         <FrameLayout
+            android:id="@+id/documentsButton"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="@drawable/rounded_button"
@@ -131,6 +132,7 @@
             android:layout_height="9dp" />
 
         <FrameLayout
+            android:id="@+id/scanQR"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="@drawable/rounded_button"

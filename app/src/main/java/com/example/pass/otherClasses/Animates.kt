@@ -1,9 +1,8 @@
-package com.example.pass.activities
+package com.example.pass.otherClasses
 
 import android.view.View
 
 class Animates {
-
     fun animatesButton(view: View, function: () -> Unit) {
         view.animate()
             .scaleX(0.95f)

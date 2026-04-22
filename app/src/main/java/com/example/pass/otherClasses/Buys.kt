@@ -1,4 +1,4 @@
-package com.example.pass.activities
+package com.example.pass.otherClasses
 
 data class Buys(
     val name: String,

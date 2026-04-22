@@ -20,6 +20,7 @@ import com.example.pass.database.equipment.EquipmentEntity
 import com.example.pass.database.equipment.EquipmentType
 import com.example.pass.database.equipment.StateEquipment
 import com.example.pass.dialog.CloseDialog
+import com.example.pass.otherClasses.Animates
 import kotlinx.coroutines.launch
 import java.util.Date
 
@@ -76,9 +77,7 @@ class AddEquipmentActivity : AppCompatActivity() {
                     equipmentTypeList,
                     groupList,
                     stateList
-                ) {
-                    finish()
-                }
+                )
             }
         }
     }
@@ -92,54 +91,19 @@ class AddEquipmentActivity : AppCompatActivity() {
         stateEquipmentSpinner: Spinner,
         equipmentTypeList: List<EquipmentType>,
         groupList: List<Int>,
-        stateList: List<StateEquipment>,
-        function: () -> Unit
+        stateList: List<StateEquipment>
     ) {
         lifecycleScope.launch {
 
-            if (nameEquipmentInput.text.isEmpty()) {
-                nameEquipmentInput.error = "Название не может быть пустым!"
-                return@launch
-            }
-
-            if (identificationNumberInput.text.isEmpty()) {
-                identificationNumberInput.error = "Номер оборудования не может быть пустой!"
-                return@launch
-            }
-
-            if (database.equipmentDao()
-                    .getCountOnNumber(identificationNumberInput.text.toString()) > 0
-            ) {
-                identificationNumberInput.error = "Номер оборудования должен быть уникальным!"
-                return@launch
-            }
-
-            if (typeEquipmentSpinner.selectedItem.equals(firstType)) {
-                Toast.makeText(
-                    this@AddEquipmentActivity, "Нужно выбрать тип оборудования!",
-                    Toast.LENGTH_LONG
-                ).show()
-                return@launch
-            }
-
-            if (stateEquipmentSpinner.selectedItem.equals(firstState)) {
-                Toast.makeText(
-                    this@AddEquipmentActivity, "Нужно выбрать состояние оборудования!",
-                    Toast.LENGTH_LONG
-                ).show()
-                return@launch
-            }
-
-            if (typeEquipmentSpinner.selectedItem.equals(EquipmentType.FURNITURE.nameDescription) && groupEquipmentSpinner.selectedItem.equals(
-                    firstGroup
+            if (validationDataInputs(
+                    nameEquipmentInput,
+                    identificationNumberInput,
+                    database,
+                    typeEquipmentSpinner,
+                    stateEquipmentSpinner,
+                    groupEquipmentSpinner
                 )
-            ) {
-                Toast.makeText(
-                    this@AddEquipmentActivity, "Нужно выбрать остовую группу!",
-                    Toast.LENGTH_LONG
-                ).show()
-                return@launch
-            }
+            ) return@launch
 
             val equipment = EquipmentEntity(
                 identificationNumber = identificationNumberInput.text.toString(),
@@ -152,8 +116,62 @@ class AddEquipmentActivity : AppCompatActivity() {
             )
 
             database.equipmentDao().savedEquipment(equipment)
-            function()
+            finish()
         }
+    }
+
+    private suspend fun validationDataInputs(
+        nameEquipmentInput: EditText,
+        identificationNumberInput: EditText,
+        database: AppDatabase,
+        typeEquipmentSpinner: Spinner,
+        stateEquipmentSpinner: Spinner,
+        groupEquipmentSpinner: Spinner
+    ): Boolean {
+        if (nameEquipmentInput.text.isEmpty()) {
+            nameEquipmentInput.error = "Название не может быть пустым!"
+            return true
+        }
+
+        if (identificationNumberInput.text.isEmpty()) {
+            identificationNumberInput.error = "Номер оборудования не может быть пустой!"
+            return true
+        }
+
+        if (database.equipmentDao()
+                .getCountOnNumber(identificationNumberInput.text.toString()) > 0
+        ) {
+            identificationNumberInput.error = "Номер оборудования должен быть уникальным!"
+            return true
+        }
+
+        if (typeEquipmentSpinner.selectedItem.equals(firstType)) {
+            Toast.makeText(
+                this@AddEquipmentActivity, "Нужно выбрать тип оборудования!",
+                Toast.LENGTH_LONG
+            ).show()
+            return true
+        }
+
+        if (stateEquipmentSpinner.selectedItem.equals(firstState)) {
+            Toast.makeText(
+                this@AddEquipmentActivity, "Нужно выбрать состояние оборудования!",
+                Toast.LENGTH_LONG
+            ).show()
+            return true
+        }
+
+        if (typeEquipmentSpinner.selectedItem.equals(EquipmentType.FURNITURE.nameDescription) && groupEquipmentSpinner.selectedItem.equals(
+                firstGroup
+            )
+        ) {
+            Toast.makeText(
+                this@AddEquipmentActivity, "Нужно выбрать остовую группу!",
+                Toast.LENGTH_LONG
+            ).show()
+            return true
+        }
+        return false
     }
 
     private fun createTypeSpinnerDropDown(

@@ -37,11 +37,10 @@
     </LinearLayout>
 
     <ScrollView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginStart="15dp"
         android:layout_marginTop="5dp"
-        android:layout_marginEnd="17dp"
+        android:foregroundGravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -51,6 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
+            android:layout_gravity="center"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -60,7 +60,9 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="visible"
+                tools:visibility="visible">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -99,7 +101,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                tools:visibility="visible">
+                tools:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="339dp"
@@ -184,7 +186,7 @@
                 android:gravity="center"
                 android:orientation="vertical"
                 android:padding="5dp"
-                tools:visibility="gone">
+                tools:visibility="visible">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -211,7 +213,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="24dp"
                         android:fontFamily="sans-serif-medium"
-                        android:text="@string/name_oborud"
+                        android:text="@string/name_equipment"
                         android:textColor="@color/black"
                         android:textSize="20sp" />
 
@@ -222,7 +224,7 @@
                         android:autofillHints="none"
                         android:background="@drawable/rounded_square_border"
                         android:elevation="3dp"
-                        android:hint="@string/enter_name_oborud"
+                        android:hint="@string/enter_name_equipment"
                         android:inputType="text"
                         android:outlineProvider="background"
                         android:paddingLeft="16sp"
@@ -346,6 +348,77 @@
                     android:layout_height="313dp"
                     android:layout_marginTop="11dp"
                     android:layout_marginBottom="22dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/actsPanel"
+                android:layout_width="match_parent"
+                android:layout_height="562dp"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/rounded_square_border"
+                android:gravity="center"
+                android:orientation="vertical"
+                tools:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/select_equipment"
+                    android:textColor="@color/black"
+                    android:textSize="20sp" />
+
+                <LinearLayout
+                    android:id="@+id/frameLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="22dp"
+                    android:layout_marginTop="17dp"
+                    android:layout_marginEnd="21dp"
+                    android:background="@drawable/rounded_square_border"
+                    android:elevation="3dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/header">
+
+                    <ImageView
+                        android:id="@+id/search_icon"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="3dp"
+
+                        android:layout_marginBottom="4dp"
+                        android:background="@drawable/ic_search_48px"
+                        android:contentDescription="@string/search_icon" />
+
+                    <EditText
+                        android:id="@+id/search_input_identification"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center_horizontal"
+                        android:autofillHints="name"
+                        android:background="@android:color/transparent"
+                        android:fontFamily="sans-serif-medium"
+                        android:hint="@string/enter_identification"
+                        android:inputType="text"
+                        android:textColor="#747474"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/equipmentActViewer"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="19dp"
+                    android:layout_marginBottom="19dp"
+                    android:layout_weight="1"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
             </LinearLayout>
 

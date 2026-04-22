@@ -205,6 +205,31 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:padding="18dp"
+                android:background="@drawable/rounded_square_border"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ic_error_outline_48px"
+                    android:contentDescription="@string/alert"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/alert_message_add_cabinet"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    android:justificationMode="inter_word"/>
+
+            </LinearLayout>
+
 
             <FrameLayout
                 android:id="@+id/addButton"

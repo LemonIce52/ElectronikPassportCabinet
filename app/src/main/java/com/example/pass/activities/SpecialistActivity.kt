@@ -1,5 +1,6 @@
 package com.example.pass.activities
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.EditText
@@ -14,6 +15,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.pass.R
 import com.example.pass.adapters.CabinetAdapter
 import com.example.pass.database.AppDatabase
+import com.example.pass.database.documents.TypeDocument
+import com.example.pass.otherClasses.Animates
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,12 +35,21 @@ class SpecialistActivity : AppCompatActivity() {
 
         val addCabinetButton: FrameLayout = findViewById(R.id.addCabinetButton)
         val equipmentStartButton: FrameLayout = findViewById(R.id.equipmentStartButton)
+        val documentationButton: FrameLayout = findViewById(R.id.documentsButton)
+        val scanQRButton: FrameLayout = findViewById(R.id.scanQR)
 
         createList(database)
 
         addCabinetButton.setOnClickListener { Animates().animatesButton(it) { addCabinet() } }
         equipmentStartButton.setOnClickListener { Animates().animatesButton(it) { equipmentStart() } }
+        documentationButton.setOnClickListener { Animates().animatesButton(it) { getDocumentsActivity(this, userid) } }
+        scanQRButton.setOnClickListener { Animates().animatesButton(it) { scanQr() } }
 
+    }
+
+    private fun scanQr() {
+        val intent = Intent(this, ScanQRActivity::class.java)
+        startActivity(intent)
     }
 
     private fun equipmentStart() {
@@ -83,6 +95,16 @@ class SpecialistActivity : AppCompatActivity() {
             }
         }
 
+    }
+
+    private fun getDocumentsActivity(context: Context, userId: Long) {
+        val intent = Intent(context, DocumentsActivity::class.java)
+
+        intent.putExtra("nameTypeDocumentsList", arrayListOf(TypeDocument.ACT_OF_ACCEPTANCE.name, TypeDocument.WRITE_OF_ACT.name))
+        intent.putExtra("currUserId", userId)
+        intent.putExtra("nameActivity", "Акты")
+
+        startActivity(intent)
     }
 
 }

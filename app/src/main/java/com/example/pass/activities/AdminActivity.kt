@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import androidx.core.widget.addTextChangedListener
 import com.example.pass.database.documents.TypeDocument
+import com.example.pass.otherClasses.Animates
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
