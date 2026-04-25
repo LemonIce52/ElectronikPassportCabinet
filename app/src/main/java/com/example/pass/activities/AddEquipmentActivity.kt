@@ -1,9 +1,13 @@
 package com.example.pass.activities
 
+import android.content.Context
+import android.graphics.Rect
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
+import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.EditText
@@ -210,7 +214,10 @@ class AddEquipmentActivity : AppCompatActivity() {
 
         val listener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                if (typeEquipmentSpinner.selectedItem.equals(EquipmentType.ELECTRONICS.nameDescription) || typeEquipmentSpinner.selectedItem.equals(firstType)) {
+                if (typeEquipmentSpinner.selectedItem.equals(EquipmentType.ELECTRONICS.nameDescription) || typeEquipmentSpinner.selectedItem.equals(
+                        firstType
+                    )
+                ) {
                     groupFrame.visibility = View.GONE
                 } else {
                     groupFrame.visibility = View.VISIBLE
@@ -308,6 +315,23 @@ class AddEquipmentActivity : AppCompatActivity() {
         } else {
             finish()
         }
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (ev?.action == MotionEvent.ACTION_DOWN) {
+            val v = currentFocus
+            if (v is EditText) {
+                val outRect = Rect()
+                v.getGlobalVisibleRect(outRect)
+                // Если нажатие произошло вне области текущего EditText
+                if (!outRect.contains(ev.rawX.toInt(), ev.rawY.toInt())) {
+                    v.clearFocus()
+                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(v.windowToken, 0)
+                }
+            }
+        }
+        return super.dispatchTouchEvent(ev)
     }
 
 }

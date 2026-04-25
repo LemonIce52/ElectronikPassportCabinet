@@ -1,9 +1,19 @@
 package com.example.pass.activities
 
+import android.content.Context
+import android.graphics.Rect
 import android.os.Bundle
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams
+import android.view.inputmethod.InputMethodManager
+import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.Spinner
 import android.widget.Toast
 import com.example.pass.R
 import androidx.appcompat.app.AppCompatActivity
@@ -21,6 +31,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 
 class EditUserActivity : AppCompatActivity() {
 
@@ -32,6 +43,7 @@ class EditUserActivity : AppCompatActivity() {
 
         val db: AppDatabase = AppDatabase.getDatabase(this)
         val userId = intent.getLongExtra("USER_ID", -1)
+        val currUserRole = Role.valueOf(intent.getStringExtra("currUserRole") ?: Role.ADMIN.name)
         var currUserEntity: UsersEntity? = null
 
         val name: EditText = findViewById(R.id.name_equipment_input)
@@ -39,16 +51,31 @@ class EditUserActivity : AppCompatActivity() {
         val email: EditText = findViewById(R.id.emailInput)
         val password: EditText = findViewById(R.id.passwordInput)
         val dateInput: EditText = findViewById(R.id.dateInput)
+        val roleUserSpinner: Spinner = findViewById(R.id.usersRoleSpinner)
 
         val closeButton: ImageView = findViewById(R.id.closeButtonEdit)
         val deleteButton: FrameLayout = findViewById(R.id.deleteUserButton)
         val savedChangesButton: FrameLayout = findViewById(R.id.savedChangesButton)
 
+        val userRoleInput: LinearLayout = findViewById(R.id.userRoleInput)
+
         if (userId == -1L) {
-            Toast.makeText(this, "Произошла ошибка или пользователь был удален!", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Произошла ошибка или пользователь был удален!", Toast.LENGTH_LONG)
+                .show()
             finish()
         }
 
+        if (currUserRole == Role.MAIN_ADMIN) userRoleInput.visibility = View.VISIBLE
+        else userRoleInput.visibility = View.GONE
+
+        val listRole = Role.entries.toList()
+        val usersRoleList = mutableListOf<Role>()
+
+        listRole.forEach {
+            if (it != Role.MAIN_ADMIN) usersRoleList.add(it)
+        }
+
+        createSpinnerDropDown(usersRoleList, roleUserSpinner)
 
         lifecycleScope.launch {
             db.usersDao().getUserOnIdFlow(userId).collect { latestUser ->
@@ -62,7 +89,9 @@ class EditUserActivity : AppCompatActivity() {
             name,
             lastName,
             email,
-            dateInput
+            dateInput,
+            roleUserSpinner,
+            usersRoleList
         )
 
         dateInput.setOnClickListener {
@@ -94,7 +123,10 @@ class EditUserActivity : AppCompatActivity() {
                     lastName,
                     email,
                     password,
-                    dateInput
+                    dateInput,
+                    currUserRole,
+                    roleUserSpinner,
+                    usersRoleList
                 )
             }
         }
@@ -113,10 +145,33 @@ class EditUserActivity : AppCompatActivity() {
                     lastName,
                     email,
                     password,
-                    dateInput
+                    dateInput,
+                    currUserRole,
+                    roleUserSpinner,
+                    usersRoleList
                 )
             }
         }
+    }
+
+    private fun createSpinnerDropDown(
+        roleUsersList: List<Role>,
+        roleUsersSpinner: Spinner,
+    ) {
+        val list = mutableListOf<String>()
+        roleUsersList.forEach {
+            list.add(it.nameRole)
+        }
+
+        val typeDocumentsAdapter = ArrayAdapter<String>(
+            this,
+            android.R.layout.simple_spinner_item,
+            list
+        )
+
+        typeDocumentsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+        roleUsersSpinner.adapter = typeDocumentsAdapter
     }
 
     private fun savedChangesButton(
@@ -127,7 +182,10 @@ class EditUserActivity : AppCompatActivity() {
         lastName: EditText,
         email: EditText,
         password: EditText,
-        dateInput: EditText
+        dateInput: EditText,
+        currRole: Role,
+        roleSpinner: Spinner,
+        roleList: List<Role>
     ) {
         lifecycleScope.launch {
 
@@ -146,7 +204,8 @@ class EditUserActivity : AppCompatActivity() {
                     name,
                     lastName,
                     email,
-                    if (password.text.isEmpty()) userEntity.password else hashPass(password.text.toString())
+                    if (password.text.isEmpty()) userEntity.password else hashPass(password.text.toString()),
+                    if (currRole == Role.MAIN_ADMIN) roleList[roleSpinner.selectedItemPosition] else userEntity.role
                 )
 
                 if (currUserEntity != null && currUserEntity != userEntity) {
@@ -161,7 +220,8 @@ class EditUserActivity : AppCompatActivity() {
                     finish()
                 } else {
                     Toast.makeText(
-                        this@EditUserActivity, "Данные пользователя не были изменены или возникла проблема!",
+                        this@EditUserActivity,
+                        "Данные пользователя не были изменены или возникла проблема!",
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -190,7 +250,10 @@ class EditUserActivity : AppCompatActivity() {
         lastName: EditText,
         email: EditText,
         password: EditText,
-        dateInput: EditText
+        dateInput: EditText,
+        currRole: Role,
+        roleSpinner: Spinner,
+        roleList: List<Role>
     ) {
         lifecycleScope.launch {
             val userEntity: UsersEntity? = db.usersDao().getUserOnId(userId)
@@ -202,10 +265,13 @@ class EditUserActivity : AppCompatActivity() {
                     name = name,
                     lastName = lastName,
                     email = email,
-                    password = if (password.text.isEmpty()) userEntity.password else hashPass(password.text.toString())
+                    password = if (password.text.isEmpty()) userEntity.password else hashPass(
+                        password.text.toString()
+                    ),
+                    role = if (currRole == Role.MAIN_ADMIN) roleList[roleSpinner.selectedItemPosition] else userEntity.role
                 )
 
-                if (userEntity == currUserEntity) {
+                if (userEntity != currUserEntity) {
                     val dialog = CloseDialog()
                     dialog.show(supportFragmentManager, "CloseDialog")
                 } else {
@@ -284,7 +350,9 @@ class EditUserActivity : AppCompatActivity() {
         name: EditText,
         lastName: EditText,
         email: EditText,
-        dateInput: EditText
+        dateInput: EditText,
+        userRoleSpinner: Spinner,
+        listRole: List<Role>
     ) {
 
 
@@ -295,6 +363,7 @@ class EditUserActivity : AppCompatActivity() {
                 name.setText(userEntity.name)
                 lastName.setText(userEntity.lastName)
                 email.setText(userEntity.email)
+                userRoleSpinner.setSelection(listRole.indexOf(userEntity.role))
 
                 val birthday: Date = userEntity.birthday
                 val formater = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
@@ -314,25 +383,23 @@ class EditUserActivity : AppCompatActivity() {
         name: EditText,
         lastName: EditText,
         email: EditText,
-        password: String
+        password: String,
+        role: Role
     ): UsersEntity? {
         try {
             val formater = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+            formater.timeZone = TimeZone.getTimeZone("UTC")
             val date: Date? = formater.parse(birthday.text.toString())
 
             if (date != null) {
-                val calendar = Calendar.getInstance()
-                calendar.clear()
-                calendar.time = date
-
                 val currUsersEntity = UsersEntity(
                     userId = userId,
                     name = name.text.toString(),
                     lastName = lastName.text.toString(),
-                    birthday = calendar.time,
+                    birthday = date,
                     email = email.text.toString(),
                     password = password,
-                    role = Role.TECH_SPECIALIST
+                    role = role
                 )
 
                 return currUsersEntity
@@ -347,5 +414,22 @@ class EditUserActivity : AppCompatActivity() {
 
     private fun hashPass(password: String): String {
         return BCrypt.hashpw(password, BCrypt.gensalt())
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (ev?.action == MotionEvent.ACTION_DOWN) {
+            val v = currentFocus
+            if (v is EditText) {
+                val outRect = Rect()
+                v.getGlobalVisibleRect(outRect)
+                // Если нажатие произошло вне области текущего EditText
+                if (!outRect.contains(ev.rawX.toInt(), ev.rawY.toInt())) {
+                    v.clearFocus()
+                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(v.windowToken, 0)
+                }
+            }
+        }
+        return super.dispatchTouchEvent(ev)
     }
 }

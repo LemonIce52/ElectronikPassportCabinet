@@ -2,9 +2,12 @@ package com.example.pass.activities
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Rect
 import android.os.Bundle
 import android.print.PrintAttributes
 import android.print.PrintManager
+import android.view.MotionEvent
+import android.view.inputmethod.InputMethodManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.EditText
@@ -35,8 +38,10 @@ class DocumentsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_documents)
 
-        val nameTypeDocumentationList: List<String>? = intent.getStringArrayListExtra("nameTypeDocumentsList")
-        val typeDocumentationList: List<TypeDocument> = nameTypeDocumentationList?.map { TypeDocument.valueOf(it) } ?: listOf()
+        val nameTypeDocumentationList: List<String>? =
+            intent.getStringArrayListExtra("nameTypeDocumentsList")
+        val typeDocumentationList: List<TypeDocument> =
+            nameTypeDocumentationList?.map { TypeDocument.valueOf(it) } ?: listOf()
         val currUserId: Long = intent.getLongExtra("currUserId", -1)
         val nameActivity: String = intent.getStringExtra("nameActivity") ?: "Документация"
 
@@ -48,16 +53,25 @@ class DocumentsActivity : AppCompatActivity() {
 
         createDocumentList(database, this, typeDocumentationList)
 
-        addDocumentsButton.setOnClickListener { Animates().animatesButton(it) { addDocumentsButton(this, currUserId,
-            nameTypeDocumentationList as ArrayList<String>
-        ) } }
+        addDocumentsButton.setOnClickListener {
+            Animates().animatesButton(it) {
+                addDocumentsButton(
+                    this, currUserId,
+                    nameTypeDocumentationList as ArrayList<String>
+                )
+            }
+        }
 
         returnButton.setOnClickListener {
             Animates().animatesButton(it) { finish() }
         }
     }
 
-    private fun addDocumentsButton(context: Context, currUserId: Long, listName: ArrayList<String>) {
+    private fun addDocumentsButton(
+        context: Context,
+        currUserId: Long,
+        listName: ArrayList<String>
+    ) {
         val intent = Intent(context, CreateDocumentsActivity::class.java)
 
         intent.putExtra("currUserId", currUserId)
@@ -67,7 +81,11 @@ class DocumentsActivity : AppCompatActivity() {
     }
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    private fun createDocumentList(database: AppDatabase, context: Context, typesDocumentationList: List<TypeDocument>) {
+    private fun createDocumentList(
+        database: AppDatabase,
+        context: Context,
+        typesDocumentationList: List<TypeDocument>
+    ) {
         val recyclerView: RecyclerView = findViewById(R.id.oborudViewer)
         val searchInput: EditText = findViewById(R.id.search_document)
 
@@ -117,5 +135,22 @@ class DocumentsActivity : AppCompatActivity() {
             }
         }
         webView.loadDataWithBaseURL(null, htmlString, "text/html", "utf-8", null)
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (ev?.action == MotionEvent.ACTION_DOWN) {
+            val v = currentFocus
+            if (v is EditText) {
+                val outRect = Rect()
+                v.getGlobalVisibleRect(outRect)
+                // Если нажатие произошло вне области текущего EditText
+                if (!outRect.contains(ev.rawX.toInt(), ev.rawY.toInt())) {
+                    v.clearFocus()
+                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(v.windowToken, 0)
+                }
+            }
+        }
+        return super.dispatchTouchEvent(ev)
     }
 }

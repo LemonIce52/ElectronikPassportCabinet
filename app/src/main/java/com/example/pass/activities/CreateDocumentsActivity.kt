@@ -1,10 +1,13 @@
 package com.example.pass.activities
 
 import android.content.Context
+import android.graphics.Rect
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
+import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.EditText
@@ -124,7 +127,15 @@ class CreateDocumentsActivity : AppCompatActivity() {
             adapterActs
         )
 
-        closeButton.setOnClickListener { Animates().animatesButton(it) { closeButton(listToBuyEquipment, period, planPriceInput) } }
+        closeButton.setOnClickListener {
+            Animates().animatesButton(it) {
+                closeButton(
+                    listToBuyEquipment,
+                    period,
+                    planPriceInput
+                )
+            }
+        }
         createDocumentButton.setOnClickListener {
             Animates().animatesButton(it) {
                 createDocument(
@@ -300,9 +311,14 @@ class CreateDocumentsActivity : AppCompatActivity() {
 
         val buys = Buys(nameEquipmentInput.text.toString(), count!!, price!!)
 
+        priceInput.setText(null)
+        countInput.setText(null)
+        nameEquipmentInput.setText(null)
+
         listEquipment.forEach { element ->
             if (element.name == buys.name) {
-                Toast.makeText(this, "Оборудование с таким именем уже есть!", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Оборудование с таким именем уже есть!", Toast.LENGTH_LONG)
+                    .show()
                 return
             }
         }
@@ -449,17 +465,26 @@ class CreateDocumentsActivity : AppCompatActivity() {
                 panelActs.visibility = View.GONE
 
                 when (typeDocumentsSpinner.selectedItem) {
-                    TypeDocument.SHOPPING_PLAN.nameDocument -> panelPlanBuying.visibility = View.VISIBLE
-                    TypeDocument.FORECAST_OF_PLANNED_COSTS.nameDocument -> panelPlanShopping.visibility = View.VISIBLE
+                    TypeDocument.SHOPPING_PLAN.nameDocument -> panelPlanBuying.visibility =
+                        View.VISIBLE
+
+                    TypeDocument.FORECAST_OF_PLANNED_COSTS.nameDocument -> panelPlanShopping.visibility =
+                        View.VISIBLE
+
                     TypeDocument.ACT_OF_ACCEPTANCE.nameDocument -> {
                         panelActs.visibility = View.VISIBLE
-                        createCardList(database, this@CreateDocumentsActivity, adapter,
-                            StateEquipment.NEW)
+                        createCardList(
+                            database, this@CreateDocumentsActivity, adapter,
+                            StateEquipment.NEW
+                        )
                     }
+
                     TypeDocument.WRITE_OF_ACT.nameDocument -> {
                         panelActs.visibility = View.VISIBLE
-                        createCardList(database, this@CreateDocumentsActivity, adapter,
-                            StateEquipment.WRITTEN_OFF)
+                        createCardList(
+                            database, this@CreateDocumentsActivity, adapter,
+                            StateEquipment.WRITTEN_OFF
+                        )
                     }
                 }
             }
@@ -471,7 +496,12 @@ class CreateDocumentsActivity : AppCompatActivity() {
     }
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    private fun createCardList(database: AppDatabase, context: Context, adapter: AssigningAndUnpinAdapter, state: StateEquipment){
+    private fun createCardList(
+        database: AppDatabase,
+        context: Context,
+        adapter: AssigningAndUnpinAdapter,
+        state: StateEquipment
+    ) {
         val recyclerView: RecyclerView = findViewById(R.id.equipmentActViewer)
         val searchInput: EditText = findViewById(R.id.search_input_identification)
 
@@ -510,5 +540,22 @@ class CreateDocumentsActivity : AppCompatActivity() {
         } else {
             finish()
         }
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (ev?.action == MotionEvent.ACTION_DOWN) {
+            val v = currentFocus
+            if (v is EditText) {
+                val outRect = Rect()
+                v.getGlobalVisibleRect(outRect)
+                // Если нажатие произошло вне области текущего EditText
+                if (!outRect.contains(ev.rawX.toInt(), ev.rawY.toInt())) {
+                    v.clearFocus()
+                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(v.windowToken, 0)
+                }
+            }
+        }
+        return super.dispatchTouchEvent(ev)
     }
 }

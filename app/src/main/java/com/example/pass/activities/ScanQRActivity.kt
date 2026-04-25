@@ -1,8 +1,13 @@
 package com.example.pass.activities
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Rect
 import android.os.Bundle
+import android.view.MotionEvent
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -45,7 +50,7 @@ class ScanQRActivity : AppCompatActivity() {
 
         checkCameraPermission()
 
-        returnButton.setOnClickListener{ Animates().animatesButton(it) { finish() } }
+        returnButton.setOnClickListener { Animates().animatesButton(it) { finish() } }
 
 
     }
@@ -70,39 +75,53 @@ class ScanQRActivity : AppCompatActivity() {
                         if (cabinet != null) {
                             val dialog = CartCabinetScanningDialog.newInstance(cabinet)
 
-                            supportFragmentManager.setFragmentResultListener("dialogClosed", this@ScanQRActivity) { _, _ ->
+                            supportFragmentManager.setFragmentResultListener(
+                                "dialogClosed",
+                                this@ScanQRActivity
+                            ) { _, _ ->
                                 startScanningCamera()
                             }
 
                             dialog.show(supportFragmentManager, "CabinetDialog")
                         } else {
+                            Toast.makeText(this@ScanQRActivity, "Нет кабинета с таким QR!", Toast.LENGTH_LONG).show()
                             startScanningCamera()
                         }
 
                     }
                 }
+
                 "equipment" -> {
                     lifecycleScope.launch {
-                        val equipment = db.equipmentDao().getEquipmentByIdentificationNumber(splitQr[1])
+                        val equipment =
+                            db.equipmentDao().getEquipmentByIdentificationNumber(splitQr[1])
 
                         if (equipment != null) {
                             val dialog = CardEquipmentDialog.newInstance(equipment, false)
 
-                            supportFragmentManager.setFragmentResultListener("dialogClosed", this@ScanQRActivity) { _, _ ->
+                            supportFragmentManager.setFragmentResultListener(
+                                "dialogClosed",
+                                this@ScanQRActivity
+                            ) { _, _ ->
                                 startScanningCamera()
                             }
 
                             dialog.show(supportFragmentManager, "CabinetDialog")
                         } else {
+                            Toast.makeText(this@ScanQRActivity, "Нет оборудования с таким QR!", Toast.LENGTH_LONG).show()
                             startScanningCamera()
                         }
                     }
                 }
 
-                else -> {startScanningCamera()}
+                else -> {
+                    Toast.makeText(this, "QR не распознан!", Toast.LENGTH_LONG).show()
+                    startScanningCamera()
+                }
             }
 
         } else {
+            Toast.makeText(this, "QR не распознан!", Toast.LENGTH_LONG).show()
             startScanningCamera()
         }
     }
@@ -121,7 +140,8 @@ class ScanQRActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-            == PackageManager.PERMISSION_GRANTED) {
+            == PackageManager.PERMISSION_GRANTED
+        ) {
             barcodeView.pause()
             startScanningCamera()
         }
@@ -137,5 +157,21 @@ class ScanQRActivity : AppCompatActivity() {
         startScanning()
     }
 
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (ev?.action == MotionEvent.ACTION_DOWN) {
+            val v = currentFocus
+            if (v is EditText) {
+                val outRect = Rect()
+                v.getGlobalVisibleRect(outRect)
+                // Если нажатие произошло вне области текущего EditText
+                if (!outRect.contains(ev.rawX.toInt(), ev.rawY.toInt())) {
+                    v.clearFocus()
+                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(v.windowToken, 0)
+                }
+            }
+        }
+        return super.dispatchTouchEvent(ev)
+    }
 
 }

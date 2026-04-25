@@ -2,8 +2,11 @@ package com.example.pass.activities
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -59,11 +62,20 @@ class AssigningEquipmentToCabinetActivity : AppCompatActivity() {
         }
     }
 
-    private fun assigning(database: AppDatabase, adapter: AssigningAndUnpinAdapter, cabinetId: Long) {
-        val selectionList = adapter.currentList.filter { it.isChecked }.map{ it.equipment.equipmentId }
+    private fun assigning(
+        database: AppDatabase,
+        adapter: AssigningAndUnpinAdapter,
+        cabinetId: Long
+    ) {
+        val selectionList =
+            adapter.currentList.filter { it.isChecked }.map { it.equipment.equipmentId }
 
         if (selectionList.isEmpty()) {
-            Toast.makeText(this, "Требуется выбрать оборудование которое вы хотите закрепить за кабинетом!", Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                this,
+                "Требуется выбрать оборудование которое вы хотите закрепить за кабинетом!",
+                Toast.LENGTH_LONG
+            ).show()
             return
         }
 
@@ -75,7 +87,11 @@ class AssigningEquipmentToCabinetActivity : AppCompatActivity() {
     }
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    private fun createCardList(database: AppDatabase, context: Context, adapter: AssigningAndUnpinAdapter){
+    private fun createCardList(
+        database: AppDatabase,
+        context: Context,
+        adapter: AssigningAndUnpinAdapter
+    ) {
         val recyclerView: RecyclerView = findViewById(R.id.equipmentAssigningViewer)
         val searchInput: EditText = findViewById(R.id.search_input_identification)
 
@@ -104,6 +120,23 @@ class AssigningEquipmentToCabinetActivity : AppCompatActivity() {
 
     private fun closeActivity() {
         finish()
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (ev?.action == MotionEvent.ACTION_DOWN) {
+            val v = currentFocus
+            if (v is EditText) {
+                val outRect = Rect()
+                v.getGlobalVisibleRect(outRect)
+                // Если нажатие произошло вне области текущего EditText
+                if (!outRect.contains(ev.rawX.toInt(), ev.rawY.toInt())) {
+                    v.clearFocus()
+                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(v.windowToken, 0)
+                }
+            }
+        }
+        return super.dispatchTouchEvent(ev)
     }
 
 }

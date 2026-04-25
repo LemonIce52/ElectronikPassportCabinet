@@ -27,7 +27,7 @@ import com.example.pass.database.users.UsersEntity
         CabinetEntity::class,
         EquipmentEntity::class
                ],
-    version = 7
+    version = 8
 )
 @TypeConverters(value = [
     ConvertersUserRole::class,
@@ -54,7 +54,6 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "database"
                 )
-                    .fallbackToDestructiveMigration(false)
                     .build()
                 INSTANCE = instance
                 instance

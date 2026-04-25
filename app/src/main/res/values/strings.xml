@@ -125,4 +125,5 @@
     <string name="end_invent">закончить инвентаризацию</string>
     <string name="cabinet_name_activity_invent">Инвентаризация %1$s</string>
     <string name="alert_password">Если вы не меняете пароль оставьте поле пустым!</string>
+    <string name="user_role">Роль пользователя</string>
 </resources>

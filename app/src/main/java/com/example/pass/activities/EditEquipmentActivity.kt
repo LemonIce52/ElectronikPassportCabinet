@@ -3,11 +3,14 @@ package com.example.pass.activities
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Rect
 import android.os.Bundle
 import android.provider.MediaStore
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
+import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.FrameLayout
@@ -204,8 +207,10 @@ class EditEquipmentActivity : AppCompatActivity() {
         lifecycleScope.launch {
 
             if (nameEquipmentInput.text.isEmpty()) {
-                Toast.makeText(this@EditEquipmentActivity, "Наименование не может быть пустым!",
-                    Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this@EditEquipmentActivity, "Наименование не может быть пустым!",
+                    Toast.LENGTH_LONG
+                ).show()
                 return@launch
             }
 
@@ -215,7 +220,10 @@ class EditEquipmentActivity : AppCompatActivity() {
             }
 
             if (database.equipmentDao()
-                    .getCountOnNumberEdit(identificationNumberInput.text.toString(), equipmentId) > 0
+                    .getCountOnNumberEdit(
+                        identificationNumberInput.text.toString(),
+                        equipmentId
+                    ) > 0
             ) {
                 identificationNumberInput.error = "Номер оборудования должен быть уникальным!"
                 return@launch
@@ -398,6 +406,23 @@ class EditEquipmentActivity : AppCompatActivity() {
                 stateSpinner.setSelection(position)
             }
         }
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (ev?.action == MotionEvent.ACTION_DOWN) {
+            val v = currentFocus
+            if (v is EditText) {
+                val outRect = Rect()
+                v.getGlobalVisibleRect(outRect)
+                // Если нажатие произошло вне области текущего EditText
+                if (!outRect.contains(ev.rawX.toInt(), ev.rawY.toInt())) {
+                    v.clearFocus()
+                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(v.windowToken, 0)
+                }
+            }
+        }
+        return super.dispatchTouchEvent(ev)
     }
 
 }

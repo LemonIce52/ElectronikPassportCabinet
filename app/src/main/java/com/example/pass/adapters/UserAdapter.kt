@@ -43,10 +43,7 @@ class UserAdapter(private val callback: (Long) -> Unit) :
             .format("dd.MM.yyyy", user.birthday)
             .toString()
 
-        holder.tvRole.text = when (user.role) {
-            Role.ADMIN -> "Администратор"
-            Role.TECH_SPECIALIST -> "Тех. специалист"
-        }
+        holder.tvRole.text = user.role.nameRole
 
         holder.itemView.setOnClickListener {
             Animates().animatesButton(it) {

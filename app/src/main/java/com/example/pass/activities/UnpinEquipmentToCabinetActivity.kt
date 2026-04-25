@@ -1,7 +1,10 @@
 package com.example.pass.activities
 
 import android.content.Context
+import android.graphics.Rect
 import android.os.Bundle
+import android.view.MotionEvent
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -33,7 +36,8 @@ class UnpinEquipmentToCabinetActivity : AppCompatActivity() {
         val cabinetId: Long = intent.getLongExtra("cabinetId", -1)
 
         if (cabinetId == -1L) {
-            Toast.makeText(this, "Произошла ошибка или кабинет был удален!", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Произошла ошибка или кабинет был удален!", Toast.LENGTH_LONG)
+                .show()
             finish()
         }
 
@@ -59,10 +63,15 @@ class UnpinEquipmentToCabinetActivity : AppCompatActivity() {
     }
 
     private fun assigning(database: AppDatabase, adapter: AssigningAndUnpinAdapter) {
-        val selectionList = adapter.currentList.filter { it.isChecked }.map{ it.equipment.equipmentId }
+        val selectionList =
+            adapter.currentList.filter { it.isChecked }.map { it.equipment.equipmentId }
 
         if (selectionList.isEmpty()) {
-            Toast.makeText(this, "Требуется выбрать оборудование которое вы хотите открепить от кабинета!", Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                this,
+                "Требуется выбрать оборудование которое вы хотите открепить от кабинета!",
+                Toast.LENGTH_LONG
+            ).show()
             return
         }
 
@@ -74,7 +83,12 @@ class UnpinEquipmentToCabinetActivity : AppCompatActivity() {
     }
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    private fun createCardList(database: AppDatabase, context: Context, adapter: AssigningAndUnpinAdapter, cabinetId: Long){
+    private fun createCardList(
+        database: AppDatabase,
+        context: Context,
+        adapter: AssigningAndUnpinAdapter,
+        cabinetId: Long
+    ) {
         val recyclerView: RecyclerView = findViewById(R.id.equipmentAssigningViewer)
         val searchInput: EditText = findViewById(R.id.search_input_identification)
 
@@ -103,5 +117,22 @@ class UnpinEquipmentToCabinetActivity : AppCompatActivity() {
 
     private fun closeActivity() {
         finish()
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (ev?.action == MotionEvent.ACTION_DOWN) {
+            val v = currentFocus
+            if (v is EditText) {
+                val outRect = Rect()
+                v.getGlobalVisibleRect(outRect)
+                // Если нажатие произошло вне области текущего EditText
+                if (!outRect.contains(ev.rawX.toInt(), ev.rawY.toInt())) {
+                    v.clearFocus()
+                    val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(v.windowToken, 0)
+                }
+            }
+        }
+        return super.dispatchTouchEvent(ev)
     }
 }

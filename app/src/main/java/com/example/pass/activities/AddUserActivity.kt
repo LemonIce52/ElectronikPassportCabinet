@@ -1,9 +1,19 @@
 package com.example.pass.activities
 
+import android.content.Context
+import android.graphics.Rect
 import android.os.Bundle
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams
+import android.view.inputmethod.InputMethodManager
+import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -21,17 +31,25 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import org.mindrot.jbcrypt.BCrypt
+import kotlin.collections.forEach
 
 class AddUserActivity : AppCompatActivity() {
 
     private var selectedDateInMs: Long = MaterialDatePicker.todayInUtcMilliseconds()
+    private val firstElementSpinner: String = "Выберите роль пользователя"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_user)
 
+        val currUserRole = Role.valueOf(intent.getStringExtra("currUserRole") ?: Role.ADMIN.name)
+
         val closeButton: ImageView = findViewById(R.id.closeButton)
         val registerButton: FrameLayout = findViewById(R.id.savedButton)
+        val roleUserInput: LinearLayout = findViewById(R.id.userRoleInput)
+
+        if (currUserRole == Role.MAIN_ADMIN) roleUserInput.visibility = View.VISIBLE
+        else roleUserInput.visibility = View.GONE
 
         val nameInput: EditText = findViewById(R.id.name_equipment_input);
         val lastNameInput: EditText = findViewById(R.id.lastNameInput)
@@ -39,6 +57,16 @@ class AddUserActivity : AppCompatActivity() {
         val passwordInput: EditText = findViewById(R.id.passwordInput)
         val dateInput: EditText = findViewById(R.id.dateInput)
         var birthday: Date? = null
+        val usersRoleSpinner: Spinner = findViewById(R.id.usersRoleSpinner)
+
+        val listRole = Role.entries.toList()
+        val usersRoleList = mutableListOf<Role>()
+
+        listRole.forEach {
+            if (it != Role.MAIN_ADMIN) usersRoleList.add(it)
+        }
+
+        createSpinnerDropDown(usersRoleList, usersRoleSpinner)
 
         dateInput.setOnClickListener {
             val builder = MaterialDatePicker.Builder.datePicker()
@@ -82,11 +110,49 @@ class AddUserActivity : AppCompatActivity() {
                     lastNameInput,
                     birthday,
                     emailInput,
-                    passwordInput
+                    passwordInput,
+                    usersRoleSpinner,
+                    currUserRole,
+                    usersRoleList
                 )
             }
         }
 
+    }
+
+    private fun createSpinnerDropDown(
+        roleUsersList: List<Role>,
+        roleUsersSpinner: Spinner,
+    ) {
+        val list = mutableListOf(firstElementSpinner)
+        roleUsersList.forEach {
+            list.add(it.nameRole)
+        }
+
+        val typeDocumentsAdapter = object : ArrayAdapter<String>(
+            this,
+            android.R.layout.simple_spinner_item,
+            list
+        ) {
+            override fun getDropDownView(
+                position: Int,
+                convertView: View?,
+                parent: ViewGroup
+            ): View {
+                return if (position == 0) {
+                    View(context).apply {
+                        layoutParams = LayoutParams(0, 0)
+                        visibility = View.GONE
+                    }
+                } else {
+                    super.getDropDownView(position, null, parent)
+                }
+            }
+        }
+
+        typeDocumentsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+        roleUsersSpinner.adapter = typeDocumentsAdapter
     }
 
     private fun registerUser(
@@ -94,7 +160,10 @@ class AddUserActivity : AppCompatActivity() {
         lastNameInput: EditText,
         birthday: Date?,
         emailInput: EditText,
-        passwordInput: EditText
+        passwordInput: EditText,
+        usersRoleSpinner: Spinner,
+        currUserRole: Role,
+        roleList: List<Role>
     ) {
         lifecycleScope.launch {
 
@@ -121,7 +190,7 @@ class AddUserActivity : AppCompatActivity() {
                 birthday = birthday!!,
                 email = email,
                 password = hashPass(password),
-                role = Role.TECH_SPECIALIST
+                role = if (currUserRole == Role.MAIN_ADMIN) roleList[usersRoleSpinner.selectedItemPosition - 1] else Role.TECH_SPECIALIST
             )
 
             database.usersDao().savedUser(userEntity)
@@ -224,5 +293,22 @@ class AddUserActivity : AppCompatActivity() {
             val dialog = CloseDialog()
             dialog.show(supportFragmentManager, "CloseDialog")
         }
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (ev?.action == MotionEvent.ACTION_DOWN) {
+            val v = currentFocus
+            if (v is EditText) {
+                val outRect = Rect()
+                v.getGlobalVisibleRect(outRect)
+                // Если нажатие произошло вне области текущего EditText
+                if (!outRect.contains(ev.rawX.toInt(), ev.rawY.toInt())) {
+                    v.clearFocus()
+                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(v.windowToken, 0)
+                }
+            }
+        }
+        return super.dispatchTouchEvent(ev)
     }
 }

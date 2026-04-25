@@ -1,8 +1,12 @@
 package com.example.pass.activities
 
+import android.content.Context
 import android.content.Intent
+import android.graphics.Rect
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -65,12 +69,13 @@ class MainActivity : AppCompatActivity() {
 
             if (user != null && checkPass(password, user.password)) {
                 val nextActivity = when (user.role) {
-                    Role.ADMIN -> AdminActivity::class.java
+                    Role.ADMIN, Role.MAIN_ADMIN -> AdminActivity::class.java
                     Role.TECH_SPECIALIST -> SpecialistActivity::class.java
                 }
 
                 val intent = Intent(this@MainActivity, nextActivity)
                 intent.putExtra("currUserId", user.userId)
+                intent.putExtra("currUserRole", user.role.name)
 
                 startActivity(intent)
                 finish()
@@ -101,16 +106,33 @@ class MainActivity : AppCompatActivity() {
             calendar.set(2023, Calendar.DECEMBER, 31, 0, 0, 0)
             calendar.set(Calendar.MILLISECOND, 0)
 
-            val admin= UsersEntity(
+            val admin = UsersEntity(
                 name = "admin",
                 lastName = "admin",
                 birthday = calendar.time,
                 email = "admin@admin",
-                password = BCrypt.hashpw("12345678", BCrypt.gensalt()),
-                role = Role.ADMIN
+                password = BCrypt.hashpw("ADMIN2435", BCrypt.gensalt()),
+                role = Role.MAIN_ADMIN
             )
 
             database.usersDao().savedUser(admin)
         }
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (ev?.action == MotionEvent.ACTION_DOWN) {
+            val v = currentFocus
+            if (v is EditText) {
+                val outRect = Rect()
+                v.getGlobalVisibleRect(outRect)
+                // Если нажатие произошло вне области текущего EditText
+                if (!outRect.contains(ev.rawX.toInt(), ev.rawY.toInt())) {
+                    v.clearFocus()
+                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(v.windowToken, 0)
+                }
+            }
+        }
+        return super.dispatchTouchEvent(ev)
     }
 }

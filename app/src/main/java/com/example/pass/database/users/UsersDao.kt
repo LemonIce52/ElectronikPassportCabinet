@@ -20,10 +20,10 @@ interface UsersDao {
 
     @Query("""
     SELECT * FROM User 
-    WHERE role = :role 
+    WHERE role IN (:roles)
     AND (name || ' ' || lastName LIKE '%' || :search || '%')
 """)
-    fun getAllUserOnTechnical(role: Role, search: String = ""): Flow<List<UsersEntity>>
+    fun getAllUsers(roles: List<Role>, search: String = ""): Flow<List<UsersEntity>>
 
     @Query("SELECT COUNT(*) FROM User WHERE email = :email")
     suspend fun getUsersOnEmail(email: String): Int

@@ -2,7 +2,10 @@ package com.example.pass.activities
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Rect
 import android.os.Bundle
+import android.view.MotionEvent
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
@@ -31,15 +34,16 @@ class AdminActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_admin)
         val currUserId = intent.getLongExtra("currUserId", -1)
+        val currUserRole = Role.valueOf(intent.getStringExtra("currUserRole") ?: Role.ADMIN.name)
 
         val database: AppDatabase = AppDatabase.getDatabase(this)
         val addButton: FrameLayout = findViewById(R.id.addPersonalButton)
         val documentsButton: FrameLayout = findViewById(R.id.documentsButton)
 
-        createCardList(database, this)
+        createCardList(database, this, currUserRole)
 
         addButton.setOnClickListener {
-            Animates().animatesButton(it) { getAddPersonalActivity(this) }
+            Animates().animatesButton(it) { getAddPersonalActivity(this, currUserRole) }
         }
 
         documentsButton.setOnClickListener {
@@ -48,13 +52,14 @@ class AdminActivity : AppCompatActivity() {
     }
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    private fun createCardList(database: AppDatabase, context: Context) {
+    private fun createCardList(database: AppDatabase, context: Context, role: Role) {
         val recyclerView: RecyclerView = findViewById(R.id.oborudViewer)
         val searchInput: EditText = findViewById(R.id.search_users)
 
         val adapter = UserAdapter { userId ->
             val intent = Intent(this, EditUserActivity::class.java).apply {
                 putExtra("USER_ID", userId)
+                putExtra("currUserRole", role.name)
             }
 
             startActivity(intent)
@@ -74,7 +79,9 @@ class AdminActivity : AppCompatActivity() {
                 searchQuery
                     .debounce(150)
                     .flatMapLatest { text ->
-                        database.usersDao().getAllUserOnTechnical(Role.TECH_SPECIALIST, text)
+                        if (role == Role.MAIN_ADMIN) database.usersDao()
+                            .getAllUsers(listOf(Role.TECH_SPECIALIST, Role.ADMIN), text)
+                        else database.usersDao().getAllUsers(listOf(Role.TECH_SPECIALIST), text)
                     }
                     .collect { list ->
                         adapter.submitList(list)
@@ -83,18 +90,43 @@ class AdminActivity : AppCompatActivity() {
         }
     }
 
-    private fun getAddPersonalActivity(context: Context) {
-        startActivity(Intent(context, AddUserActivity::class.java))
+    private fun getAddPersonalActivity(context: Context, role: Role) {
+        val intent = Intent(context, AddUserActivity::class.java)
+        intent.putExtra("currUserRole", role.name)
+        startActivity(intent)
     }
 
     private fun getDocumentsActivity(context: Context, userId: Long) {
         val intent = Intent(context, DocumentsActivity::class.java)
 
-        intent.putExtra("nameTypeDocumentsList", arrayListOf(TypeDocument.SHOPPING_PLAN.name, TypeDocument.FORECAST_OF_PLANNED_COSTS.name))
+        intent.putExtra(
+            "nameTypeDocumentsList",
+            arrayListOf(
+                TypeDocument.SHOPPING_PLAN.name,
+                TypeDocument.FORECAST_OF_PLANNED_COSTS.name
+            )
+        )
         intent.putExtra("currUserId", userId)
         intent.putExtra("nameActivity", getString(R.string.name_documentations))
 
         startActivity(intent)
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (ev?.action == MotionEvent.ACTION_DOWN) {
+            val v = currentFocus
+            if (v is EditText) {
+                val outRect = Rect()
+                v.getGlobalVisibleRect(outRect)
+                // Если нажатие произошло вне области текущего EditText
+                if (!outRect.contains(ev.rawX.toInt(), ev.rawY.toInt())) {
+                    v.clearFocus()
+                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(v.windowToken, 0)
+                }
+            }
+        }
+        return super.dispatchTouchEvent(ev)
     }
 
 }

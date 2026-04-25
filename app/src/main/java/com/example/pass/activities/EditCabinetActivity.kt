@@ -1,6 +1,10 @@
 package com.example.pass.activities
 
+import android.content.Context
+import android.graphics.Rect
 import android.os.Bundle
+import android.view.MotionEvent
+import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.FrameLayout
@@ -116,22 +120,30 @@ class EditCabinetActivity : AppCompatActivity() {
                 return@launch
             }
 
-            if (database.cabinetDao().getCountCabinetForNameEdit(nameInput.text.toString(), cabinetId) > 0) {
+            if (database.cabinetDao()
+                    .getCountCabinetForNameEdit(nameInput.text.toString(), cabinetId) > 0
+            ) {
                 nameInput.error = "Имя кабинета должно быть уникальным!"
                 return@launch
             }
 
-            if (widthInput.text.isEmpty() || widthInput.text.toString().toIntOrNull() == null || widthInput.text.toString().toInt() <= 0) {
+            if (widthInput.text.isEmpty() || widthInput.text.toString()
+                    .toIntOrNull() == null || widthInput.text.toString().toInt() <= 0
+            ) {
                 widthInput.error = "Ширина не может быть пустой, меньшей или равной 0!"
                 return@launch
             }
 
-            if (heightInput.text.isEmpty() || heightInput.text.toString().toIntOrNull() == null || heightInput.text.toString().toInt() <= 0) {
+            if (heightInput.text.isEmpty() || heightInput.text.toString()
+                    .toIntOrNull() == null || heightInput.text.toString().toInt() <= 0
+            ) {
                 heightInput.error = "Высота не может быть пустой, меньшей или равной 0!"
                 return@launch
             }
 
-            if (lengthInput.text.isEmpty() || lengthInput.text.toString().toIntOrNull() == null || lengthInput.text.toString().toInt() <= 0) {
+            if (lengthInput.text.isEmpty() || lengthInput.text.toString()
+                    .toIntOrNull() == null || lengthInput.text.toString().toInt() <= 0
+            ) {
                 lengthInput.error = "Длинна не может быть пустой, меньшей или равной 0!"
                 return@launch
             }
@@ -158,12 +170,16 @@ class EditCabinetActivity : AppCompatActivity() {
 
                     finish()
                 } else {
-                    Toast.makeText(this@EditCabinetActivity, "Данные не был изменены!",
-                        Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        this@EditCabinetActivity, "Данные не был изменены!",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             } else {
-                Toast.makeText(this@EditCabinetActivity, "Произошла ошибка, возможно кабинет удален!",
-                    Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this@EditCabinetActivity, "Произошла ошибка, возможно кабинет удален!",
+                    Toast.LENGTH_LONG
+                ).show()
                 finish()
             }
         }
@@ -205,8 +221,10 @@ class EditCabinetActivity : AppCompatActivity() {
                 typeInputs.setSelection(position)
 
             } else {
-                Toast.makeText(this@EditCabinetActivity, "Произошла ошибка, возможно кабинет удален!",
-                    Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this@EditCabinetActivity, "Произошла ошибка, возможно кабинет удален!",
+                    Toast.LENGTH_LONG
+                ).show()
                 finish()
             }
 
@@ -256,7 +274,7 @@ class EditCabinetActivity : AppCompatActivity() {
         height: Int,
         length: Int
     ): CabinetEntity {
-        return CabinetEntity (
+        return CabinetEntity(
             id,
             name,
             type,
@@ -264,6 +282,23 @@ class EditCabinetActivity : AppCompatActivity() {
             width,
             length
         )
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (ev?.action == MotionEvent.ACTION_DOWN) {
+            val v = currentFocus
+            if (v is EditText) {
+                val outRect = Rect()
+                v.getGlobalVisibleRect(outRect)
+                // Если нажатие произошло вне области текущего EditText
+                if (!outRect.contains(ev.rawX.toInt(), ev.rawY.toInt())) {
+                    v.clearFocus()
+                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(v.windowToken, 0)
+                }
+            }
+        }
+        return super.dispatchTouchEvent(ev)
     }
 
 }
