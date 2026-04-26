@@ -58,7 +58,7 @@
             android:background="@android:color/transparent"
             android:hint="@string/enter_nameCabinet"
             android:inputType="text"
-            android:autofillHints="name"
+            android:autofillHints="none"
             android:fontFamily="sans-serif-medium"
             android:textColor="#747474"
             android:textSize="20sp"/>

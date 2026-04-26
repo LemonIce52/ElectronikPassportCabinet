@@ -13,7 +13,6 @@ import com.example.pass.otherClasses.Animates
 import com.example.pass.database.users.Role
 import com.example.pass.database.users.UsersEntity
 
-// 1. Наследуемся от ListAdapter. Убираем (val users) из конструктора!
 class UserAdapter(private val callback: (Long) -> Unit) :
     ListAdapter<UsersEntity, UserAdapter.UserViewHolder>(UserDiffCallback()) {
 
@@ -30,7 +29,6 @@ class UserAdapter(private val callback: (Long) -> Unit) :
     }
 
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
-        // 2. Используем getItem(position) вместо users[position]
         val user = getItem(position)
 
         holder.tvFullName.text = holder.itemView.context.getString(
@@ -52,14 +50,13 @@ class UserAdapter(private val callback: (Long) -> Unit) :
         }
     }
 
-    // 3. Добавляем DiffUtil. Он сравнивает элементы, чтобы анимация была плавной
     class UserDiffCallback : DiffUtil.ItemCallback<UsersEntity>() {
         override fun areItemsTheSame(oldItem: UsersEntity, newItem: UsersEntity): Boolean {
-            return oldItem.userId == newItem.userId // Сравнение по ID
+            return oldItem.userId == newItem.userId
         }
 
         override fun areContentsTheSame(oldItem: UsersEntity, newItem: UsersEntity): Boolean {
-            return oldItem == newItem // Сравнение всех полей данных
+            return oldItem == newItem
         }
     }
 }

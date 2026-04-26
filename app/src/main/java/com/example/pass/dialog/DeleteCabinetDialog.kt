@@ -20,7 +20,7 @@ class DeleteCabinetDialog : DialogFragment() {
     companion object {
         fun newInstance(cabinetId: Long): DeleteCabinetDialog {
             val args = Bundle()
-            args.putLong("cabinetId", cabinetId) // Сохраняем данные
+            args.putLong("cabinetId", cabinetId)
             val fragment = DeleteCabinetDialog()
             fragment.arguments = args
             return fragment

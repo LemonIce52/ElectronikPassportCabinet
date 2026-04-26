@@ -141,8 +141,7 @@
                     android:orientation="vertical"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/header"
-                    tools:visibility="visible">
+                    app:layout_constraintTop_toBottomOf="@+id/header">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -263,7 +262,7 @@
                             android:background="@drawable/rounded_square_border"
                             android:elevation="3dp"
                             android:hint="@string/enter_price"
-                            android:inputType="text"
+                            android:inputType="numberSigned"
                             android:outlineProvider="background"
                             android:paddingLeft="16sp"
                             android:paddingRight="16sp"
@@ -301,7 +300,7 @@
                             android:background="@drawable/rounded_square_border"
                             android:elevation="3dp"
                             android:hint="@string/enter_count"
-                            android:inputType="text"
+                            android:inputType="numberSigned"
                             android:outlineProvider="background"
                             android:paddingLeft="16sp"
                             android:paddingRight="16sp"
@@ -396,7 +395,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_gravity="center_horizontal"
-                        android:autofillHints="name"
+                        android:autofillHints="none"
                         android:background="@android:color/transparent"
                         android:fontFamily="sans-serif-medium"
                         android:hint="@string/enter_identification"

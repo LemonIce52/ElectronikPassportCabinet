@@ -98,7 +98,6 @@ class CartCabinetScanningDialog : DialogFragment()  {
 
     override fun onDismiss(dialog: android.content.DialogInterface) {
         super.onDismiss(dialog)
-        // Отправляем сигнал в Activity
         parentFragmentManager.setFragmentResult("dialogClosed", androidx.core.os.bundleOf())
     }
 

@@ -14,7 +14,7 @@ import com.example.pass.otherClasses.Animates
 import com.example.pass.otherClasses.Buys
 
 class BuysAdapter(
-    private val onDeleteClick: (Int) -> Unit // Передаем позицию для удаления
+    private val onDeleteClick: (Int) -> Unit
 ) : ListAdapter<Buys, BuysAdapter.BuyViewHolder>(BuyDiffCallback()) {
 
     class BuyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
